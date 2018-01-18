@@ -30,13 +30,15 @@ int getline(char line[], int ll)
 	/*complex loop condition here*/
 	for(i = 0; i < ll-1 && (c = getchar()) != EOF && c != '\n'; i++)
 		line[i] = c;
-	
+
+	/*this will cause the program to crash on max line lengths*/
 	if(c == '\n')
 	{
 		line[i] = c;
 		++i;
 	}
 	line[i] = '\0'; /*append a null terminator to indicate end of string*/
-	return i;
+	return i; /*doesn't actually record the entire line length, just the 
+	number of chars that could fit into the array declared*/
 }
 
