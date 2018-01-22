@@ -5,6 +5,7 @@
 
 #include <stdio.h> 
 #include <ctype.h>
+#include <stdlib.h>
 
 int htoi(char hex_str[]);/*hex string to in converter*/
 int hatoi_util(char c); 
@@ -14,10 +15,14 @@ int hatoi_util(char c);
 main()
 {
 	/*TODO; write test cases*/
+	printf("%s -> %d\n", "asdf", htoi("asdf"));
+	printf("%s -> %d\n", "0001", htoi("0001"));
+	printf("%s -> %d\n", "0xAAAA", htoi("0xAAAA"));
 }
 
 /*this is a derivative of atoi from page 43*/
 /*need to negative signs*/
+/*need to check for string length, otherwise segfault or garbage read*/
 int htoi(char hex_str[])
 {
 	int i, n;
@@ -37,7 +42,7 @@ int htoi(char hex_str[])
 		i+=2; /*skip over the acceptable prefix*/
 	}
 	/*maybe no prefix found.*/
-	for(/*don't reset i*/; hex_str[i] != '\0'; i++)
+	for(i; hex_str[i] != '\0'; i++)
 	{
 		if(!isxdigit(hex_str[i]))
 		{
@@ -45,21 +50,23 @@ int htoi(char hex_str[])
 		}
 		if(isdigit(hex_str[i]))
 		{
-			n = n * 16 + ((int)strtol(hex_str[i]));
-			i++;
+			/*We can leverage the contiguity of numeric characters in both ASCII
+			 * and EBCDIC*/
+			n = n * 16 + (hex_str[i] - '0');
 		}
 		else
 		{
 			n = n * 16 + (hatoi_util(hex_str[i]));
-			i++;
 		}
 	}
+	return sign_factor * n;
 }
 
 int hatoi_util(char c)
 {
 	c = tolower(c);
-	switch(c){
+	switch(c)
+	{
 		case 'a': return 10;
 		case 'b': return 11;
 		case 'c': return 12;
