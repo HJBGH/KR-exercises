@@ -8,10 +8,17 @@ unsigned invert(unsigned x, int n, int p); /* prototype*/
 int main()
 {
 	/*TODO: write tests*/
+	printf("%u -> %u\n", 403,  invert(403, 5, 3));
 	return 0;
 }
 
-unsigned invert(unsigned x, int n, int p)
+unsigned invert(unsigned x, int p, int n)
 {
-	/*TODO*/
+	unsigned mask = ((~x >> (p+1-n)) & ~(~0 << n));
+	printf("one's complement x: %u\n", ~x);
+	printf("shifted x: %u\n", (~x >> (p+1-n)));
+	printf("mask: %u\n", mask);
+	/*set target bits to 0*/
+	x = x & ~(~(~0 << n) << ((p+1)-n));
+	return x | mask;
 }
