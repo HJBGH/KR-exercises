@@ -12,15 +12,20 @@ int main()
 {
 	/*TODO: write test cases*/
 	/*write a binary print method*/
+	printf("%u %u -> %u\n", 0, 7, setbits(0,6,3,7));
 	return 0;
 }
 
 /*doesn't do size checking or any other validation*/
 unsigned setbits(unsigned x, int p, int n, unsigned y)
 {
-	unsigned mask = ~((~(~0 << n)) << (p+1-n));
-	x = x & mask;
-	mask = (y & ~(~0 << n)) /*this still needs to be shifted*/
+	unsigned mask = ~(~(~0 << n) << ((p+1)-n));/*this expression is correct*/
+	printf("mask: %u\n", mask);
+	x = x & mask;/*set target bits to 0*/
+	printf("x: %u\n", x);
+	mask = (y & ~(~0 << n)) << (p+1-n);/*edit the mask to contain the desired new bits*/
+	printf("mask: %u\n", mask);
 	/* XOR x and the final mask*/
+	return x | mask; /*hopefully this is correct*/
 
 }
