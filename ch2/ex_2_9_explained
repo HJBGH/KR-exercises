@@ -1,0 +1,11 @@
+I'm not going to write a new version of bitcount because I don't think it's
+worth my time.
+To answer the question; In a two's complement number system x &= (x-1) deletes
+the rightmost bit a follows:
+-The expression x - 1 causes the rightmost bit with a 1 value to have it's 
+value distributed across the lower bits and decremented by 1.
+-The AND operator cancels out any value the lower bits held, as the actual x 
+value still has zero values in these bits.
+-The assignment operator assigns the result of this operation to x, removing the
+rightmost 1 bit.
+
