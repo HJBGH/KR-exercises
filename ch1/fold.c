@@ -10,7 +10,7 @@
 
 /*prints the folded version of the line*/
 /*newline should be longer than line*/
-int fold_line(char line[], char newline[]);
+int fold_line(char line[], int len);
 int getline(char line[], int line_len);
 
 int main()
@@ -38,35 +38,42 @@ int getline(char line[], int ll)
 
 /*there is no defensive programming in this function, the ideal use case is
  * all that is considered*/
-int fold(char line[], char newline[])
+int fold(char line[], int len)/*where len is the actual line length, not the capacity of the array */
 {
-	int last_blank = -1;
-	int i, j;
-	for(j = i = 0; line[i] != '\n' && line[i] != '\0'; i++, j++)
+	if(len < THRESHOLD)
 	{
-		newline[j] = line[i];
-		if(line[i] == '\t' || line[i] == ' ')
-		{
-			last_blank = i;
-		}
-		if(i%THRESHOLD == 0)/*Handle really long lines*/
-		{
-			/*descisions to be made here*/
-			/*normal case found*/
-			if(last_blank > -1)
-			{
-				newline[last_blank] = '\n';
-				last_blank = -1;
-			}
-			/*things get interesting here, we have to an additonal two
-			 * characters to indicate that a line has been continued into
-			 * it's neighbour */
-			else if(last_blank == -1)
-			{
-				
-			}
-			/*another case for blank found*/
-		}
+		printf("%s", line);
 	}
-	return 0;
+	else
+	{
+		int last_blank = -1;
+		int i, j;
+		for(j = i = 0; line[i] != '\n' && line[i] != '\0'; i++, j++)
+		{
+			newline[j] = line[i];
+			if(line[i] == '\t' || line[i] == ' ')
+			{
+				last_blank = i;
+			}
+			if(i%THRESHOLD == 0)/*Handle really long lines*/
+			{
+				/*descisions to be made here*/
+				/*normal case found*/
+				if(last_blank > -1)
+				{
+					newline[last_blank] = '\n';
+					last_blank = -1;
+				}
+				/*things get interesting here, we have to an additonal two
+			 	* characters to indicate that a line has been continued into
+			 	* it's neighbour */
+				else if(last_blank == -1)
+				{
+					/*Find the difference between i and j and add it to last_blank to work this out.
+				}
+				/*another case for blank found*/
+			}
+		}
+		return 0;
+	}
 }
