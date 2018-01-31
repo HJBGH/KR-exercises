@@ -15,7 +15,6 @@ int getline(char line[], int line_len);
 
 int main()
 {	
-	/*TODO: write tests*/
 	/*write tests for:
 	 * edge cases -
 	 * 		very short / non existant lines
@@ -23,7 +22,22 @@ int main()
 	 * 		lines without blanks
 	 * normal cases -
 	 * 		Actual sentences
+	 * these are all contained in the test file called ./fold_tests.txt
+	 * note that these tests are very basic and only check the algorithm,
+	 * not validate input error recovery.
 	 */
+	char line[LINE_LEN];
+	char newline[2 * LINE_LEN];
+	int len;
+	int test_count = 0;
+	while((len = getline(line, LINE_LEN)) > 0)
+	{
+		/*printf("test count: %d\n", test_count);*/
+		fold(line, newline);
+		printf("%s", newline);
+		test_count++;
+	}
+	putchar('\n');
 	return 0;
 }
 
@@ -45,6 +59,8 @@ int getline(char line[], int ll)
 
 /*there is no defensive programming in this function, the ideal use case is
  * all that is considered*/
+/*also, newlines should really be called newlines[], as there are multiple in 
+ * a single array*/
 int fold(char line[], char newline[])
 {
 	int last_blank = -1;
@@ -56,7 +72,7 @@ int fold(char line[], char newline[])
 		{
 			last_blank = i;
 		}
-		if(i%THRESHOLD == 0)/*Handle really long lines*/
+		if(i%THRESHOLD == 0 && i != 0)/*Handle really long lines*/
 		{
 			/*descisions to be made here*/
 			/*normal case found*/
@@ -79,6 +95,12 @@ int fold(char line[], char newline[])
 			}
 		}
 	}
-	return 0;
+	if(line[i] == '\n')
+	{
+		/*off by one?*/
+		newline[j] = '\n';
+	}
+	newline[++j] = '\0';
+	return j;
 }
 

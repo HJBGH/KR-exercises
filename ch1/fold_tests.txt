@@ -1,0 +1,6 @@
+This is a series of test lines to test the fold line function, whose source code can be found in fold.c
+It contains various lines that are longer than the defined threshold.
+In order to determine the behaviours of that function.
+asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf
+This is shorter than the threshold.
+..................................................................................
