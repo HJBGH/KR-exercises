@@ -10,13 +10,20 @@
 
 /*prints the folded version of the line*/
 /*newline should be longer than line*/
-int fold_line(char line[], int len);
+int fold_line(char line[], char newline[]);
 int getline(char line[], int line_len);
 
 int main()
-{
-	
+{	
 	/*TODO: write tests*/
+	/*write tests for:
+	 * edge cases -
+	 * 		very short / non existant lines
+	 * 		very long lines
+	 * 		lines without blanks
+	 * normal cases -
+	 * 		Actual sentences
+	 */
 	return 0;
 }
 
@@ -38,42 +45,40 @@ int getline(char line[], int ll)
 
 /*there is no defensive programming in this function, the ideal use case is
  * all that is considered*/
-int fold(char line[], int len)/*where len is the actual line length, not the capacity of the array */
+int fold(char line[], char newline[])
 {
-	if(len < THRESHOLD)
+	int last_blank = -1;
+	int i, j;
+	for(j = i = 0; line[i] != '\n' && line[i] != '\0'; i++, j++)
 	{
-		printf("%s", line);
-	}
-	else
-	{
-		int last_blank = -1;
-		int i, j;
-		for(j = i = 0; line[i] != '\n' && line[i] != '\0'; i++, j++)
+		newline[j] = line[i];
+		if(line[i] == '\t' || line[i] == ' ')
 		{
-			newline[j] = line[i];
-			if(line[i] == '\t' || line[i] == ' ')
+			last_blank = i;
+		}
+		if(i%THRESHOLD == 0)/*Handle really long lines*/
+		{
+			/*descisions to be made here*/
+			/*normal case found*/
+			if(last_blank > -1)
 			{
-				last_blank = i;
+				newline[last_blank + (j-i)] = '\n';
+				last_blank = -1;
 			}
-			if(i%THRESHOLD == 0)/*Handle really long lines*/
+			/*things get interesting here, we have to add an additonal two
+		 	* characters to indicate that a line has been continued into
+		 	* it's neighbour */
+			else if(last_blank == -1)
 			{
-				/*descisions to be made here*/
-				/*normal case found*/
-				if(last_blank > -1)
-				{
-					newline[last_blank] = '\n';
-					last_blank = -1;
-				}
-				/*things get interesting here, we have to an additonal two
-			 	* characters to indicate that a line has been continued into
-			 	* it's neighbour */
-				else if(last_blank == -1)
-				{
-					/*Find the difference between i and j and add it to last_blank to work this out.
-				}
-				/*another case for blank found*/
+				char swap = newline[j]; /* we have to replace this char*/
+				newline[j] = '-'; /*hypen to indicate that line continues
+				on next line*/
+				newline[++j] = '\n'; /*newline*/
+				newline[++j] = swap; /*put the original character back where
+				it should be*/
 			}
 		}
-		return 0;
 	}
+	return 0;
 }
+
