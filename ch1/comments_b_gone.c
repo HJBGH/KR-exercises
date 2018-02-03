@@ -14,6 +14,8 @@
 /*unfortunately the structure of this program is going to be fairly basic
  * in order to avoid having an expressed limit on the size of the input.*/
 
+/*I'VE JUST REMEMBERED THAT THIS IS SUPPOSED TO CHECK FOR COMMENT NESTING,
+ * TODO: ADD CASE FOR DEALING WITH NESTED COMMENTS*/
 int main()
 {
 	int c; /*character*/
