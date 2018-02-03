@@ -54,6 +54,7 @@ int main()
 		{
 			/*change state to out*/
 			state = OUT;
+			nextc = getchar();
 		}
 		else if(state == OUT)
 		{
