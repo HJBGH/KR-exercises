@@ -6,8 +6,8 @@
  * Write a program to remove all comments from a C program. Don't forget to 
  * handle quoted strings and character constants properly*/
 #include <stdio.h>
-#define IN 1;
-#define OUT 0;
+#define IN 1
+#define OUT 0
 /*comments may span multiple lines, which means that the input cannot be
  * interpreted on a strictly line by line basis*/
 /*this program only checks for ANSI style comments with a slash and an asterix*/
@@ -41,7 +41,7 @@ int main()
 		}
 		else if(nextc == '"')
 		{
-			string_state == OUT ? string_state = IN : string_state = OUT;
+			string_state = (string_state == OUT) ? IN : OUT;
 		}
 
 		/* now do comment elimination*/
