@@ -2,6 +2,8 @@
  * the form zzz.yye-x, where a floating point number can be followed by 'e' or 
  * 'E' and an optionally signed exponent*/
 
+
+/*REMEMBER TO INITALIZE VARIABLES BEFORE USE OTHERWISE GARBAGE GETS USED*/
 #include <ctype.h>
 #include <stdio.h>
 #include <math.h> /*this is probably cheating*/
@@ -64,10 +66,9 @@ double atof(char s[])
 		{
 			i++;
 		}
-		for(exp_mag = 1; isdigit(s[i]); i++)
+		for(exp_val = 0; isdigit(s[i]); i++)
 		{
 			exp_val = 10 * exp_val + (s[i] - '0'); /*i'm certain this isn't portable*/
-			exp_mag *= 10;
 		}
 	/*the return statements here could probably be condensed into one with
 	 * proper structure, but this exercise is damn boring, so I'm not going
@@ -78,6 +79,8 @@ double atof(char s[])
 		}
 		else
 		{
+			/*printf("exp_val %.10f\n", exp_val);
+			printf("10 raised to exponent: %.10f\n", pow(10, exp_val));*/
 			return (sign * val / power) / pow(10, exp_val);
 		}
 	}
