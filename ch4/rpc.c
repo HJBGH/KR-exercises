@@ -193,18 +193,36 @@ void ungetch(int);
 /*s[] is the recepticle*/
 int getop(char s[])
 {
-	int i, c;
+	printf("calling getop\n");
+	int i = 0, c, d;/*ALWAYS INITIALIZE AS YOU DECLARE*/
 
-	while((s[0] = c = getch()) == ' ' || c == '\t')
+	while((s[i++] = c = getch()) == ' ' || c == '\t')
 		;
 
-	s[1] = '\0';
-	if(!isdigit(c) && c != '.')
+	s[i] = '\0';
+	if(!isdigit(c) && c != '.' && c != '-')
 	{
 		return c; /*not a number*/
 	}
 
-	i = 0;
+	/*handle negative number*/
+	if(c == '-')
+	{
+		printf("Negative case\n");
+		d = getch();
+		if(!isdigit(c) && c != '.')
+		{
+			printf("Returning c\n");
+			return c;
+		}
+		/*s[0] has already been set to c*/
+		c = d;
+	}
+	else
+	{
+		c = getch();
+	}
+
 	if(isdigit(c)) /*collect integer bit*/
 	{
 		while(isdigit(s[++i] = c = getch()))
@@ -218,6 +236,7 @@ int getop(char s[])
 	s[i] = '\0';
 	if(c != EOF)
 		ungetch(c);
+	printf("%s\n", s);
 	return NUMBER;
 }
 
@@ -236,5 +255,8 @@ void ungetch(int c)
 	if (bufp >= BUFSIZE)
 		printf("ungetch: too many characters\n");
 	else
+	{
+		printf("ungetching\n");
 		buf[bufp++] = c;
+	}
 }
