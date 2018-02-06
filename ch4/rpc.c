@@ -100,19 +100,39 @@ double pop(void)
 }
 
 /*and now, for your enjoyment, i/o funtion prototypes*/
-int getch(void);
+int getch(void); /*getch as in get-char*/
 int ungetch(int);
 
-/*getop: get next operator or numeric operand*/
+/*getop: get next operator or numeric operand, goddamn this code is awful*/
+/*s[] is the recepticle*/
 int getop(char s[])
 {
-	int i, c;
+	int i, c, d;
 
-	while((s[0] = c = getch()) == ' ' || c== '\t')
+	/*the idiom below eats whitespace, also sets the first character of s to
+	 * be whitespace*/
+	while((s[0] = c = getch()) == ' ' || c == '\t')
 		;
-	s[1] = '\0';/*wat?*/
-	if(!isdigit(c) && c != '.')
+
+	s[1] = '\0';/*this is such crap*/
+	if(!isdigit(c) && c != '.' && c != '-')
 		return c;
+
+	/*handle negatives*/
+	if(c == '-')
+	{
+		if(!isdigit(d = getch()) && d != '.')
+		{
+
+			return c;
+		}
+		c = d;
+	}
+	else
+	{
+		c = getch();
+	}
+
 	i = 0;
 	if(isdigit(c)) /* collect int part*/
 		while(isdigit(s[++i] = c = getch()))
