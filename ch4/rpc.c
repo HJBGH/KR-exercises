@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h> /*atof()*/
 #include <ctype.h>
+#include <math.h>/*access to pow, exp, and sin*/
 
 #define MAXOP 100
 #define BUFSIZE 100
@@ -61,12 +62,23 @@ int main()
 				op2 = pop();
 				if(op2 != 0.0)
 				{
-					push(pop() % op2);
+					push(fmod(pop(),op2));
 				}
 				else
 				{
 					printf("error: zero divisor\n");
 				}
+				break;
+			case 's': /*little s for sin()*/
+				push(sin(pop()));
+				break;
+			case 'e': /*little e for exp()*/
+				push(exp(pop()));
+				break;
+			case 'p': /*little p for pow()*/
+				op2 = pop();
+				push(pow(pop(), op2));/*this might blow up if there's an empty
+				stack of if a 0 is on it*/
 				break;
 			case '\n':
 				printf("\t%.8g\n", pop());
@@ -156,7 +168,7 @@ void clear(void)
 
 /*and now, for your enjoyment, i/o funtion prototypes*/
 int getch(void); /*getch as in get-char*/
-int ungetch(int);
+void ungetch(int);
 
 /*getop: get next operator or numeric operand, goddamn this code is awful*/
 /*s[] is the recepticle*/
