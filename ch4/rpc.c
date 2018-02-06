@@ -45,7 +45,18 @@ int main()
 				op2 = pop();
 				if(op2 != 0.0)
 				{
-					push(pop() - op2);
+					push(pop() / op2);
+				}
+				else
+				{
+					printf("error: zero divisor\n");
+				}
+				break;
+			case '%':
+				op2 = pop();
+				if(op2 != 0.0)
+				{
+					push(pop() % op2);
 				}
 				else
 				{
@@ -119,6 +130,7 @@ int getop(char s[])
 char buf[BUFSIZE];
 int bufp = 0;
 
+/*buffer functions here*/
 int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
