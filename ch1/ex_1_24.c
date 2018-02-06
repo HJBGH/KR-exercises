@@ -35,12 +35,16 @@ int main()
 		}
 		else if(state == COMMENT)
 		{
-			/*handle cases*/
+			if(c == '*' && nextc == '/')
+			{
+				state = CODE;
+			}
 		}
 		else if(state == STRING)
 		{
 			/*handle cases*/
 		}
+		c = nextc;
 	}
 }
 
