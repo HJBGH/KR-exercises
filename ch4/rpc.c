@@ -11,6 +11,7 @@
 #define MAXOP 100
 #define BUFSIZE 100
 #define NUMBER '0'
+#define MEM_LEN 27
 #define MAXVAL 100 /*maximum depth of value stack*/
 
 int getop(char []);
@@ -21,9 +22,9 @@ int dupe(void);/*ints are to return error codes*/
 void clear(void);
 int swap(void);
 
+double mem[MEM_LEN]; /*memory indexable by alphabetical characters*/
 
 /* reverse Polish calculator */
-
 int main()
 {
 	int type;
@@ -35,6 +36,7 @@ int main()
 		switch(type)
 		{
 			case NUMBER:
+				printf("pushing a number to the stack\n");
 				push(atof(s));
 				break;
 			case '+':
@@ -75,10 +77,27 @@ int main()
 			case 'e': /*little e for exp()*/
 				push(exp(pop()));
 				break;
-			case 'p': /*little p for pow()*/
+			case '^': /*little p for pow()*/
 				op2 = pop();
 				push(pow(pop(), op2));/*this might blow up if there's an empty
 				stack of if a 0 is on it*/
+				break;
+			case '>': /*setting vars, this doesn't handle bad input well*/
+				type = getop(s);
+				if(type - 'a' < 0 || type - 'a' > 26)
+				{
+					printf("error: invalid var name\n");
+				}
+				else
+				{
+					op2 = pop();
+					printf("setting %d to %f\n", type-'a', op2);
+					mem[type - 'a'] = op2;/*this is buggy, it allow the 
+					user to fill the memory with 0.0, as pop() returns 0.0
+					when there's nothing on the stack,
+					I still don't know how to manager error recovery in this
+					language*/
+				}
 				break;
 			case '\n':
 				printf("\t%.8g\n", pop());
@@ -190,7 +209,6 @@ int getop(char s[])
 	{
 		if(!isdigit(d = getch()) && d != '.')
 		{
-
 			return c;
 		}
 		c = d;
@@ -210,6 +228,8 @@ int getop(char s[])
 	s[i] = '\0';
 	if(c != EOF)
 		ungetch(c);
+	
+	printf("%s\n", s);
 	return NUMBER;
 }
 
