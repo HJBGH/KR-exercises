@@ -118,7 +118,7 @@ int main()
 				clear();/*no error codes for this one*/
 				break;
 			default:
-				printf("error: inknown command %s\n", s);
+				printf("error: unknown command %s\n", s);
 				break;
 		}
 	}
@@ -193,43 +193,31 @@ void ungetch(int);
 /*s[] is the recepticle*/
 int getop(char s[])
 {
-	int i, c, d;
+	int i, c;
 
-	/*the idiom below eats whitespace, also sets the first character of s to
-	 * be whitespace*/
 	while((s[0] = c = getch()) == ' ' || c == '\t')
 		;
 
-	s[1] = '\0';/*this is such crap*/
-	if(!isdigit(c) && c != '.' && c != '-')
-		return c;
-
-	/*handle negatives*/
-	if(c == '-')
+	s[1] = '\0';
+	if(!isdigit(c) && c != '.')
 	{
-		if(!isdigit(d = getch()) && d != '.')
-		{
-			return c;
-		}
-		c = d;
-	}
-	else
-	{
-		c = getch();
+		return c; /*not a number*/
 	}
 
 	i = 0;
-	if(isdigit(c)) /* collect int part*/
+	if(isdigit(c)) /*collect integer bit*/
+	{
 		while(isdigit(s[++i] = c = getch()))
 			;
-	if (c == '.') /*collect fraction*/
+	}
+	if(c == '.') /*collect fraction bit*/
+	{	
 		while(isdigit(s[++i] = c = getch()))
 			;
+	}
 	s[i] = '\0';
 	if(c != EOF)
 		ungetch(c);
-	
-	printf("%s\n", s);
 	return NUMBER;
 }
 
