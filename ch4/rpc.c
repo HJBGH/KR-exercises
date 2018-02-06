@@ -15,6 +15,11 @@
 int getop(char []);
 void push(double);
 double pop(void);
+int printtop(void);
+int dupe(void);/*ints are to return error codes*/
+void clear(void);
+int swap(void);
+
 
 /* reverse Polish calculator */
 
@@ -66,6 +71,21 @@ int main()
 			case '\n':
 				printf("\t%.8g\n", pop());
 				break;
+			case 'S': /*S for swap*/
+				if(swap() != 0)
+					printf("error: not enough stack data to swap\n");
+				break;
+			case 'P':
+				if(printtop() != 0)
+					printf("error: nothing to print\n");
+				break;
+			case 'D':
+				if(dupe() != 0)
+					printf("error: nothing to duplicate on stack\n");
+				break;
+			case 'C':
+				clear();/*no error codes for this one*/
+				break;
 			default:
 				printf("error: inknown command %s\n", s);
 				break;
@@ -98,6 +118,29 @@ double pop(void)
 		return 0.0;
 	}
 }
+
+int dupe(void)
+{
+	/*todo*/
+	return 0;
+}
+
+int swap(void)
+{
+	/*todo*/
+	return 0;
+}
+
+int printtop(void)
+{
+	return 0;
+}
+
+void clear(void)
+{
+	sp = 0; /*cheat method, reset stack position to 0, leave data as is*/	
+}
+
 
 /*and now, for your enjoyment, i/o funtion prototypes*/
 int getch(void); /*getch as in get-char*/
