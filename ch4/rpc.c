@@ -119,20 +119,32 @@ double pop(void)
 	}
 }
 
+/*none of the functions I've just added do any error checking, i'm unsure of
+ * how to do it properly*/
 int dupe(void)
 {
-	/*todo*/
+	/*A basic implementation, does no error checking*/
+	double x = pop();
+	push(x);
+	push(x);
 	return 0;
 }
 
 int swap(void)
 {
 	/*todo*/
+	double x = pop();
+	double y = pop();
+	push(y);
+	push(x);
 	return 0;
 }
 
 int printtop(void)
 {
+	double x = pop();
+	push(x);
+	printf("Stack top: %f\n", x);
 	return 0;
 }
 
