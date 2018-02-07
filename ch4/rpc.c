@@ -136,21 +136,22 @@ double runfunction(char s[])
 {
 	/*deal with function call*/
 	int spare;	
-	if(strcmp("exp", s))
+	if(strcmp("exp", s) == 0)
 	{
 		/*call exp*/
 		return exp(pop());
 	}
-	if(strcmp("sin", s))
+	if(strcmp("sin", s) == 0)
 	{
 		return sin(pop());
 	}
-	if(strcmp("pow", s))
+	if(strcmp("pow", s) == 0)
 	{
 		spare = pop();
 		return pow(pop(), spare);
 	}
-	printf("Function name not recognized.\n");
+	printf("Error. function name %s not recognized.\n", s);
+	return 0.0;
 }
 
 /*EXTERNAL STACK VARS ARE HERE*/
@@ -203,7 +204,7 @@ int getop(char s[])
 			/*handle it*/
 			s[++i] = c; /*avoid erroneous string contents*/
 		}
-		s[i] = '\0';
+		s[++i] = '\0';
 		if(c != EOF)
 			ungetch(c);
 		if(strlen(s) == 1)
