@@ -53,7 +53,7 @@ int main()
 	for(i; i<MEM_LEN; i++)
 		mem[i] = 0.0; /*reset memory*/
 
-	while(getline(s) > 0) /*empty input causes program to exit*/
+	while(getline() > 0) /*empty input causes program to exit*/
 	{
 		/*call getop here*/
 		switch(type)
@@ -268,7 +268,7 @@ int getline()
 {
 	/*get the line mang*/
 	int c, i = 0;
-	for(i , i < LINE_LEN -1  && ((c = getchar()) != '\n' && c != EOF), i++)
+	for(i; i < LINE_LEN -1  && ((c = getchar()) != '\n' && c != EOF); i++)
 	{
 		expression[i] = c;
 	}
