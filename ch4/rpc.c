@@ -4,6 +4,7 @@
  * discussed later*/
 /*The code in here handles bad input insufficiently, I don't know how to do
  * error management in C yet*/
+/*due to the mind numbingly dull nature of the exercise 4.8 has been skipped*/
 
 /*THE ASSIGNMENT OPERATOR EVALUATES RIGHT TO LEFT YOU USELESS JACKASS MORON*/
 
@@ -265,6 +266,10 @@ char buf[BUFSIZE];
 int bufp = 0;
 
 /*buffer functions here*/
+/*I've misunderstood question 4.9, the char buffer cannot hold an EOF as it is
+ * defined as -1, there must be some contingency measures in case ungetch(EOF)
+ * gets called.*/
+/*these functions treat EOF the same as any other character*/
 int getch(void)
 {
 	return (bufp > 0) ? buf[--bufp] : getchar();
@@ -273,7 +278,13 @@ int getch(void)
 void ungetch(int c)
 {
 	if (bufp >= BUFSIZE)
+	{
 		printf("ungetch: too many characters\n");
+	}
+	else if(c == EOF)
+	{
+		printf("Error: cannot ungetch EOF");
+	}
 	else
 	{
 		buf[bufp++] = c;
