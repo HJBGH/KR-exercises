@@ -38,6 +38,7 @@ int main()
 	int type;
 	double op2;
 	char s[MAXOP];
+	char active_var;
 
 	int i = 0;
 	for(i; i<MEM_LEN; i++)
@@ -54,7 +55,9 @@ int main()
 				push(runfunction(s));
 				break;
 			case VAR_NAME:
-				/*how the fuck do we deal with this?*/
+				/*how the fuck do i deal with this?*/
+				active_var = s[0] - 'a';
+				push(mem[active_var]);/*takes a variable an puts it on the stack*/
 				break;
 			case '+':
 				push(pop() + pop());
@@ -89,16 +92,20 @@ int main()
 				}
 				break;
 			case '>': /*setting vars, this doesn't handle bad input well*/
-				type = getop(s);
-				if(type - 'a' < 0 || type - 'a' > 26)
+				getop(s);
+				if(strlen(s) > 1)
 				{
-					printf("error: invalid var name\n");
+					printf("error: variable names must be one character.\n");
+				}
+				if(s[0] - 'a' < 0 || s[0] - 'a' > 25)
+				{
+					printf("error: invalid var name: %c\n", s[0]);
 				}
 				else
 				{
 					op2 = pop();
-					printf("setting %d to %f\n", type-'a', op2);
-					mem[type - 'a'] = op2;/*this is buggy, it allow the 
+					printf("setting %c to %f\n", s[0]-'a', op2);
+					mem[s[0] - 'a'] = op2;/*this is buggy, it allow the 
 					user to fill the memory with 0.0, as pop() returns 0.0
 					when there's nothing on the stack,
 					I still don't know how to manager error recovery in this
@@ -310,6 +317,7 @@ int printtop(void)
 	double x = pop();
 	push(x);
 	printf("Stack top: %f\n", x);
+	mem[26] = x;/*save most recently printed value to last available variable*/
 	return 0;
 }
 
