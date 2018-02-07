@@ -15,6 +15,7 @@
 #define NUMBER '0'
 #define MEM_LEN 27
 #define MAXVAL 100 /*maximum depth of value stack*/
+#define VAR_NAME '&' /*use a character that wouldn't ever be used*/
 
 int getop(char []);
 void push(double);
@@ -32,6 +33,9 @@ int main()
 	int type;
 	double op2;
 	char s[MAXOP];
+
+	for(int i = 0; i<MEM_LEN; i++)
+		mem[i] = 0.0; /*reset memory*/
 
 	while((type = getop(s)) != EOF)
 	{
@@ -253,5 +257,16 @@ void ungetch(int c)
 	else
 	{
 		buf[bufp++] = c;
+	}
+}
+
+/*I don't see why ungets() would have to know about the buffer variables,
+ * it just creates superflous data interactions if it does*/
+void ungets(char s[])
+{
+	int i = 0;
+	while(s[i++] != '\0')
+	{
+		ungets(s[i]);
 	}
 }
