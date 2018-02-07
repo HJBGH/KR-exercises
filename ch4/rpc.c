@@ -3,6 +3,8 @@
 /*This should be split into multiple source files, but this is apparantly 
  * discussed later*/
 
+/*THE ASSIGNMENT OPERATOR EVALUATES RIGHT TO LEFT YOU USELESS JACKASS MORON*/
+
 #include <stdio.h>
 #include <stdlib.h> /*atof()*/
 #include <ctype.h>
@@ -36,14 +38,13 @@ int main()
 		switch(type)
 		{
 			case NUMBER:
-				printf("pushing a number to the stack\n");
 				push(atof(s));
 				break;
 			case '+':
 				push(pop() + pop());
 				break;
 			case '*':
-				push(pop() + pop());
+				push(pop() * pop());
 				break;
 			case '-':
 				op2 = pop();
@@ -193,34 +194,29 @@ void ungetch(int);
 /*s[] is the recepticle*/
 int getop(char s[])
 {
-	printf("calling getop\n");
 	int i = 0, c, d;/*ALWAYS INITIALIZE AS YOU DECLARE*/
+	s[1] = '\0'; /*clear the string*/
 
-	while((s[i++] = c = getch()) == ' ' || c == '\t')
-		;
+	while((s[i] = c = getch()) == ' ' || c == '\t')
+		;/*remove whitespace*/
 
-	s[i] = '\0';
 	if(!isdigit(c) && c != '.' && c != '-')
 	{
-		return c; /*not a number*/
+		return c; /*not a number, some form of instruction*/
 	}
 
 	/*handle negative number*/
 	if(c == '-')
 	{
-		printf("Negative case\n");
 		d = getch();
-		if(!isdigit(c) && c != '.')
+		if(!isdigit(d) && d != '.')
 		{
-			printf("Returning c\n");
+			/*we've found a Subtraction command*/
 			return c;
 		}
-		/*s[0] has already been set to c*/
+		s[i] = c;
+		s[++i] = d;
 		c = d;
-	}
-	else
-	{
-		c = getch();
 	}
 
 	if(isdigit(c)) /*collect integer bit*/
@@ -256,7 +252,6 @@ void ungetch(int c)
 		printf("ungetch: too many characters\n");
 	else
 	{
-		printf("ungetching\n");
 		buf[bufp++] = c;
 	}
 }
