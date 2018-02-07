@@ -33,8 +33,13 @@ int dupe(void);/*ints are to return error codes*/
 void clear(void);
 int swap(void);
 double runfunction(char []);
+int getline(void);
 
 double mem[MEM_LEN]; /*memory indexable by alphabetical characters*/
+char expression[LINE_LEN];
+int exp_p = 0; /*expression position, I'll have to reset this after each 
+use*/
+
 
 /* reverse Polish calculator */
 int main()
@@ -48,8 +53,9 @@ int main()
 	for(i; i<MEM_LEN; i++)
 		mem[i] = 0.0; /*reset memory*/
 
-	while((type = getop(s)) != EOF)
+	while(getline(s) > 0) /*empty input causes program to exit*/
 	{
+		/*call getop here*/
 		switch(type)
 		{
 			case NUMBER:
@@ -190,14 +196,6 @@ double pop(void)
 	}
 }
 
-
-
-/*and now, for your enjoyment, i/o funtion prototypes*/
-int getch(void); /*getch as in get-char*/
-void ungetch(int);
-
-int getline(void);
-
 /*getop: get next operator, numeric operand, function call or variable,
  * goddamn this code is awful*/
 /*s[] is the recepticle*/
@@ -206,22 +204,22 @@ int getop(char s[])
 	int i = 0, c, d;/*ALWAYS INITIALIZE AS YOU DECLARE*/
 	s[1] = '\0'; /*clear the string*/
 
-	/*TODO: getop needs to be re-implemented with getline*/
-
-	while((s[i] = c = getch()) == ' ' || c == '\t')
-		;/*remove whitespace*/
+	/*getop uses the exp_p and the expression string to operate*/
+	while((s[i] = c = expression[exp_p]) == ' ' || expression[exp_p] == '\t')
+	{
+		exp_p++;
+	}
 
 	/*deal with function calls and variable names*/
 	if(isalpha(c))
 	{
-		while(isalpha(c = getch()))
+		while(isalpha(c = expression[exp_p++]))
 		{
-			/*handle it*/
 			s[++i] = c; /*avoid erroneous string contents*/
 		}
+
 		s[++i] = '\0';
-		if(c != EOF)
-			ungetch(c);
+
 		if(strlen(s) == 1)
 		{
 			return VAR_NAME;
@@ -240,7 +238,7 @@ int getop(char s[])
 	/*handle negative number*/
 	if(c == '-')
 	{
-		d = getch();
+		d = expression[exp_p++];
 		if(!isdigit(d) && d != '.')
 		{
 			/*we've found a Subtraction command*/
@@ -253,25 +251,18 @@ int getop(char s[])
 
 	if(isdigit(c)) /*collect integer bit*/
 	{
-		while(isdigit(s[++i] = c = getch()))
+		while(isdigit(s[++i] = c = expression[exp_p++]))
 			;
 	}
 	if(c == '.') /*collect fraction bit*/
 	{	
-		while(isdigit(s[++i] = c = getch()))
+		while(isdigit(s[++i] = c = expression[exp_p++]))
 			;
 	}
 	s[i] = '\0';
-	if(c != EOF)
-		ungetch(c);
 	printf("%s\n", s);
 	return NUMBER;
 }
-
-char expression[LINE_LEN];
-int exp_p = 0; /*expression position, I'll have to reset this after each 
-use*/
-
 /*no function arguments just copy straight to the expression var*/
 int getline()
 {
@@ -289,48 +280,6 @@ int getline()
 	expression[i] = '\0';
 	/*this is convienient, we don't have to worry about EOF anymore*/
 	return i;
-}
-
-
-/*EXTERNAL CHAR BUFFER VARS ARE HERE*/
-char buf[BUFSIZE];
-int bufp = 0;
-
-/*buffer functions here*/
-/*I've misunderstood question 4.9, the char buffer cannot hold an EOF as it is
- * defined as -1, there must be some contingency measures in case ungetch(EOF)
- * gets called.*/
-/*these functions treat EOF the same as any other character*/
-int getch(void)
-{
-	return (bufp > 0) ? buf[--bufp] : getchar();
-}
-
-void ungetch(int c)
-{
-	if (bufp >= BUFSIZE)
-	{
-		printf("ungetch: too many characters\n");
-	}
-	else if(c == EOF)
-	{
-		printf("Error: cannot ungetch EOF");
-	}
-	else
-	{
-		buf[bufp++] = c;
-	}
-}
-
-/*I don't see why ungets() would have to know about the buffer variables,
- * it just creates superflous data interactions if it does*/
-void ungets(char s[])
-{
-	int i = 0;
-	while(s[i++] != '\0')
-	{
-		ungetch(s[i]);
-	}
 }
 
 /*none of the functions I've just added do any error checking, i'm unsure of
