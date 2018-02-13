@@ -56,30 +56,33 @@ int main()
 	while(getline() > 0) /*empty input causes program to exit*/
 	{
 		/*call getop here*/
-		switch(type)
+		printf("evaluating expression\n");
+		while((type = getop(s)) != '\0')
 		{
-			case NUMBER:
+			switch(type)
+			{
+				case NUMBER:
 				push(atof(s));
 				break;
-			case MATH_FUNC:
+				case MATH_FUNC:
 				push(runfunction(s));
 				break;
-			case VAR_NAME:
+				case VAR_NAME:
 				/*how the fuck do i deal with this?*/
 				active_var = s[0] - 'a';
 				push(mem[active_var]);/*takes a variable an puts it on the stack*/
 				break;
-			case '+':
+				case '+':
 				push(pop() + pop());
 				break;
-			case '*':
+				case '*':
 				push(pop() * pop());
 				break;
-			case '-':
+				case '-':
 				op2 = pop();
 				push(pop() - op2);
 				break;
-			case '/':
+				case '/':
 				op2 = pop();
 				if(op2 != 0.0)
 				{
@@ -90,7 +93,7 @@ int main()
 					printf("error: zero divisor\n");
 				}
 				break;
-			case '%':
+				case '%':
 				op2 = pop();
 				if(op2 != 0.0)
 				{
@@ -101,7 +104,7 @@ int main()
 					printf("error: zero divisor\n");
 				}
 				break;
-			case '>': /*setting vars, this doesn't handle bad input well*/
+				case '>': /*setting vars, this doesn't handle bad input well*/
 				getop(s);
 				if(strlen(s) > 1)
 				{
@@ -122,27 +125,28 @@ int main()
 					language*/
 				}
 				break;
-			case '\n':
+				case '\n':
 				printf("\t%.8g\n", pop());
 				break;
-			case 'S': /*S for swap*/
+				case 'S': /*S for swap*/
 				if(swap() != 0)
 					printf("error: not enough stack data to swap\n");
 				break;
-			case 'P':
+				case 'P':
 				if(printtop() != 0)
 					printf("error: nothing to print\n");
 				break;
-			case 'D':
+				case 'D':
 				if(dupe() != 0)
 					printf("error: nothing to duplicate on stack\n");
 				break;
-			case 'C':
+				case 'C':
 				clear();/*no error codes for this one*/
 				break;
-			default:
+				default:
 				printf("error: unknown command %s\n", s);
 				break;
+			}
 		}
 	}
 	return 0;
@@ -232,13 +236,14 @@ int getop(char s[])
 
 	if(!isdigit(c) && c != '.' && c != '-')
 	{
+		exp_p++;/*bad practise, really bad practise*/
 		return c; /*not a number, some form of instruction*/
 	}
 
 	/*handle negative number*/
 	if(c == '-')
 	{
-		d = expression[exp_p++];
+		d = expression[++exp_p];
 		if(!isdigit(d) && d != '.')
 		{
 			/*we've found a Subtraction command*/
@@ -251,18 +256,24 @@ int getop(char s[])
 
 	if(isdigit(c)) /*collect integer bit*/
 	{
-		while(isdigit(s[++i] = c = expression[exp_p++]))
-			;
+		while(isdigit(s[i] = c = expression[exp_p++]))
+		{
+			i++;
+		}
+			
 	}
 	if(c == '.') /*collect fraction bit*/
 	{	
-		while(isdigit(s[++i] = c = expression[exp_p++]))
-			;
+		while(isdigit(s[i] = c = expression[exp_p++]))
+		{
+			i++;
+		}
 	}
-	s[i] = '\0';
+	s[++i] = '\0';
 	printf("%s\n", s);
 	return NUMBER;
 }
+
 /*no function arguments just copy straight to the expression var*/
 int getline()
 {
@@ -281,7 +292,7 @@ int getline()
 	}
 	expression[i] = '\0';
 	/*this is convienient, we don't have to worry about EOF anymore*/
-	printf("got line -> %s\n", expression);
+	printf("got line -> %s", expression);
 	return i;
 }
 
