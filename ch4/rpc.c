@@ -199,10 +199,20 @@ void ungetch(int);
 int getop(char s[])
 {
 	int i = 0, c, d;/*ALWAYS INITIALIZE AS YOU DECLARE*/
+	static int ungotten = EOF; /*all that ungotten does is replace the first 
+	call to getch()*/
 	s[1] = '\0'; /*clear the string*/
 
-	while((s[i] = c = getch()) == ' ' || c == '\t')
-		;/*remove whitespace*/
+	if(ungotten != EOF && ungotten != ' ' && ungotten != '\t')
+	{
+		s[i] = c = ungotten;
+		ungotten = EOF;
+	}
+	else
+	{
+		while((s[i] = c = getch()) == ' ' || c == '\t')
+			;/*remove whitespace*/
+	}
 
 	/*deal with function calls and variable names*/
 	if(isalpha(c))
@@ -213,8 +223,7 @@ int getop(char s[])
 			s[++i] = c; /*avoid erroneous string contents*/
 		}
 		s[++i] = '\0';
-		if(c != EOF)
-			ungetch(c);
+		ungotten = c;
 		if(strlen(s) == 1)
 		{
 			return VAR_NAME;
@@ -255,8 +264,7 @@ int getop(char s[])
 			;
 	}
 	s[i] = '\0';
-	if(c != EOF)
-		ungetch(c);
+	ungotten = c;
 	printf("%s\n", s);
 	return NUMBER;
 }
