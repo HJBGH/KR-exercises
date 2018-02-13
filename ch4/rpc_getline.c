@@ -266,6 +266,8 @@ int getop(char s[])
 /*no function arguments just copy straight to the expression var*/
 int getline()
 {
+	/*may need to restructure this to use an argument instead of an external
+	 * var*/
 	/*get the line mang*/
 	int c, i = 0;
 	for(i; i < LINE_LEN -1  && ((c = getchar()) != '\n' && c != EOF); i++)
@@ -279,6 +281,7 @@ int getline()
 	}
 	expression[i] = '\0';
 	/*this is convienient, we don't have to worry about EOF anymore*/
+	printf("got line -> %s\n", expression);
 	return i;
 }
 
