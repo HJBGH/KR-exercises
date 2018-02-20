@@ -1,16 +1,18 @@
 /*This file contains the program outlined on pages 108-110 of K & R, with the
  * readline subroutine modified according to the suggestions in exercise 5-7*/
-
+/*note that I haven't actually measured the runtime difference, but I have 
+ * googled the exercise as included some notes*/
 #include <stdio.h>
 #include <string.h>
 
 
+#define ALLOCSIZE 10000 /*size of available space*/
 #define MAXLINES 5000
 #define MAXLEN 100
 
 char * lineptr[MAXLINES]; /*pointers to text lines*/
 
-int readlines(char * lineptr[], int nlines);
+int readlines(char * lineptr[], int nlines, char * lines);
 void writelines(char * lineptr[], int nlines);
 
 void qsort(char * lineptr[], int left, int right);
@@ -19,8 +21,9 @@ void qsort(char * lineptr[], int left, int right);
 int main()
 {
 	int nlines;
+	char lines[ALLOCSIZE];
 
-	if((nlines = readlines(lineptr, MAXLINES)) >= 0)
+	if((nlines = readlines(lineptr, MAXLINES, lines)) >= 0)
 	{
 		qsort(lineptr, 0, nlines-1);
 		writelines(lineptr, nlines);
@@ -38,24 +41,30 @@ int getline(char * s, size_t n);
 char * alloc(int); /*custom memory allocation routine*/
 
 /*readlines: read input lines*/
-int readlines(char * lineptr[], int maxlines)
+int readlines(char * lineptr[], int maxlines, char * lines)
 {
 	int len, nlines;
 	char *p, line[MAXLEN];
+	static char * lines_p = NULL;
 
+	if(lines_p == NULL)
+	{
+		lines_p = lines;
+	}
 	nlines = 0;
 	while((len = getline(line, MAXLEN)) > 0)
 	{
-		if(nlines >= maxlines || (p = alloc(len)) == NULL)
+		if(nlines >= maxlines || (lines_p + len) >= lines + ALLOCSIZE )
 		{
 			return -1;
 		}
 		else
 		{
 			line[len-1] = '\0'; /*delete newline*/
-			strcpy(p, line);
-			/*printf("got line -> %s\n", p);*/
-			lineptr[nlines++] = p;
+			strcpy(lines_p, line);
+			printf("got line -> %s\n", lines_p);
+			lineptr[nlines++] = lines_p;
+			lines_p += len;
 		}
 	}
 	return nlines;
@@ -104,7 +113,6 @@ void swap(char *v[], int i, int j)
 	v[j] = temp;
 }
 
-#define ALLOCSIZE 10000 /*size of available space*/
 
 static char allocbuf[ALLOCSIZE];
 static char * allocp = allocbuf;
