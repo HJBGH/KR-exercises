@@ -16,8 +16,20 @@ int main()
 
 int getline(char * s, size_t n)
 {
-	/*TODO: write this function*/
-	return 0;
+	int c;
+	char * s_head = s;
+	while(--n > 0 && (c=getchar()) != EOF && c != '\n')
+	{
+		*s = c;
+		s++;
+	}
+	if(c == '\n')
+	{
+		*s = c;
+		s++;
+	}
+	*s = '\0';
+	return s - s_head;
 }
 
 int getop(char * s)

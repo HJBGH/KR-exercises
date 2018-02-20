@@ -11,7 +11,7 @@
 char * lineptr[MAXLINES]; /*pointers to text lines*/
 
 int readlines(char * lineptr[], int nlines);
-int writelines(char * lineptr[], int nlines);
+void writelines(char * lineptr[], int nlines);
 
 void qsort(char * lineptr[], int left, int right);
 
@@ -24,6 +24,7 @@ int main()
 	{
 		qsort(lineptr, 0, nlines-1);
 		writelines(lineptr, nlines);
+		printf("Number of lines -> %d\n", nlines);
 		return 0;
 	}
 	else
@@ -33,7 +34,7 @@ int main()
 	}
 }
 
-int getline(char *, int);
+int getline(char * s, size_t n);
 char * alloc(int); /*custom memory allocation routine*/
 
 /*readlines: read input lines*/
@@ -53,6 +54,7 @@ int readlines(char * lineptr[], int maxlines)
 		{
 			line[len-1] = '\0'; /*delete newline*/
 			strcpy(p, line);
+			/*printf("got line -> %s\n", p);*/
 			lineptr[nlines++] = p;
 		}
 	}
@@ -67,17 +69,22 @@ void writelines(char * lineptr[], int nlines)
 }
 
 /*recursive quicksort*/
+/*sort v[left]...v[right] into increasing order*/
 void qsort(char *v[], int left, int right)
 {
+	printf("quicksorting\n");
 	int i, last;
-	void swap(char *v[], int i, int j);
+	void swap(char *v[], int i, int j);/*nested function prototype?*/
 	
 	if(left >= right)/*Array has fewer tha 2 elements*/
+	{
+		printf("done here\n");
 		return;
+	}
 
-	swap(v, left, (left + right) /2);
+	swap(v, left, (left + right)/2);
 	last = left;
-	for(i = left+1l i <= right; i++)
+	for(i = left+1; i <= right; i++)
 	{
 		if(strcmp(v[i], v[left]) < 0)
 		{
@@ -120,3 +127,22 @@ void afree(char * p)
 	if(p >= allocbuf && p < allocbuf + ALLOCSIZE)
 		allocp = p;
 }
+
+int getline(char * s, size_t n)
+{
+	int c;
+	char * s_head = s;
+	while(--n > 0 && (c=getchar()) != EOF && c != '\n')
+	{
+		*s = c;
+		s++;
+	}
+	if(c == '\n')
+	{
+		*s = c;
+		s++;
+	}
+	*s = '\0';
+	return s - s_head;
+}
+
