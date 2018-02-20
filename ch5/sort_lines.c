@@ -2,6 +2,11 @@
  * readline subroutine modified according to the suggestions in exercise 5-7*/
 /*note that I haven't actually measured the runtime difference, but I have 
  * googled the exercise as included some notes*/
+/*As it stands I don't think either method of managing memory produces much
+ * difference in this toy example because the only thing that changes is the
+ * function managing it. In a real world example using stack memory instead of
+ * heap memory would be fast I think, as heap memory would have to be assigned
+ * by the OS during runtime*/
 #include <stdio.h>
 #include <string.h>
 
