@@ -10,17 +10,32 @@
 #include <stdio.h>
 #include <string.h>
 
-char * hb_strncpy(char * s, char * t, size_t n);
+char * hb_strncpy(char * s, const char * t, size_t n);
 
 int main()
 {
-	/*TODO: write tests*/
+	char testdest[20];
+	char * testsrc = "test source";
+	hb_strncpy(testdest, testsrc, 10);
+	printf("%s\n", testdest);
+	/*Write more tests*/
 	return 0;
 }
 
-char * hb_strncpy(char * s, char * t, size_t n)
+/*in this version s is dest, t is src*/
+/*disregard memory safety when padding with '\0'*/
+char * hb_strncpy(char * s, const char * t, size_t n)
 {
-	char * t_head = t;
-	/*TODO: implement this function*/
+	char * s_head = s;
+	for(n; n > 0; n--)
+	{
+		printf("looping\n");
+		*s = *t;
+		s++;
+		if(*t != '\0')
+			t++;	
+	}
+	/*incorrect use of '\0'*/
+	return s_head;
 }
 
