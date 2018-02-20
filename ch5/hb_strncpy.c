@@ -16,7 +16,11 @@ int main()
 {
 	char testdest[20];
 	char * testsrc = "test source";
+	hb_strncpy(testdest, "Bumble", 3);
+	printf("%s\n", testdest);
 	hb_strncpy(testdest, testsrc, 10);
+	printf("%s\n", testdest);
+	hb_strncpy(testdest, "Franz Kafka", 5);
 	printf("%s\n", testdest);
 	/*Write more tests*/
 	return 0;
@@ -29,12 +33,12 @@ char * hb_strncpy(char * s, const char * t, size_t n)
 	char * s_head = s;
 	for(n; n > 0; n--)
 	{
-		printf("looping\n");
 		*s = *t;
 		s++;
 		if(*t != '\0')
 			t++;	
 	}
+	*s = '\0';
 	/*incorrect use of '\0'*/
 	return s_head;
 }
