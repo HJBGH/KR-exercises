@@ -6,6 +6,7 @@
 
 int getline(char * s, size_t n); /*get n characters int s, return it's length*/
 int getop(char * s); /*get next operator or numeric operand*/
+char * reverse(char * s, size_t l); /*reverse a string l chars long*/
 
 int main()
 {
@@ -23,4 +24,10 @@ int getop(char * s)
 {
 	/*TODO: write this function*/
 	return 0;
+}
+
+char * reverse(char * s, size_t l)
+{
+	/*TODO: write this function*/
+	return NULL;
 }
