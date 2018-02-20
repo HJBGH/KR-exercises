@@ -13,6 +13,9 @@ int hb_strncmp(const char * s, const char * t, size_t n);
 int main()
 {
 	/*TODO: write tests*/
+	printf("This should be zero ->\t%d\n", hb_strncmp("implore", "imply", 3));
+	printf("This should be > zero ->\t%d\n", hb_strncmp("abelone", "zebra", 3));
+	printf("This should be < zero ->\t%d\n", hb_strncmp("zone", "aleph", 2));
 	return 0;
 }
 
