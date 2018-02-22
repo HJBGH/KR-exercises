@@ -10,7 +10,7 @@ void push(double new);
 int parsearg(char * arg);/*this abuses the convertability of char to int and back*/
 
 static double stack[STACK_MAX];
-static double *stack_head = stack;
+static double *stack_p = stack;
 
 /*we only evaluate one expression per execution*/
 
@@ -32,8 +32,8 @@ int main(int argc, char *argv[])
 
 double pop()
 {
-	if(stack != stackhead)
-		return *stack--; /*idk if this'll work*/
+	if(stack != stack_p)
+		return *stack_p--; /*idk if this'll work*/
 	/*god-awful error handling*/
 	printf("Error: empty stack");
 	return 0;
@@ -41,9 +41,9 @@ double pop()
 
 void push(double new)
 {
-	if(stack != stackhead+STACK_MAX)
+	if(stack_p != stack+STACK_MAX)
 	{
-		*++stack = new;
+		*++stack_p = new;
 		return;
 	}
 	printf("Error: full stack");
