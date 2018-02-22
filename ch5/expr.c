@@ -3,7 +3,10 @@
  * arguments with C.*/
 
 #include <stdio.h>
+#include <string.h>
 #define STACK_MAX 128
+#define NUMBER '0' /*signal passed from parsearg to main to signal that an arg
+is a number*/
 
 double pop();
 void push(double new);
@@ -16,7 +19,8 @@ static double *stack_p = stack;
 
 int main(int argc, char *argv[])
 {
-	char * arg;
+	char * arg_p;
+	int parsed_arg;
 	if(argc == 1)
 	{
 		/*this isn't an entirly correct error message*/
@@ -24,8 +28,37 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	arg_p = argv+1;/*set to first argument*/
+	double hold;
 	/*I'll break this into functions later*/
-
+	do
+	{
+		parsed_arg = parsearg(arg_p);
+		switch(parsed_arg)
+		{
+			case NUMBER:
+				push(strtod(arg_p));
+				break;
+			case '*':
+				push(pop() * pop());
+				break;
+			case '+':
+				push(pop() + pop());
+				break;
+			case '/':
+				hold = pop();
+				push(pop() / hold);
+				break;
+			case '-':
+				hold = pop();
+				push(pop() - hold);
+				break;
+			default:
+				printf("Error: parsing argument failed %s\n", arg_p);
+				return -1;
+		}
+	}
+	while(arg_p != argv + (argc + 1))
 	
 	return 0; /*Everything went smoothly*/
 }
@@ -50,9 +83,35 @@ void push(double new)
 	return;
 }
 
-int parsearg(char * arg)
+int parsearg(char *arg)
 {
-	/*TODO: write argument parsing function*/
+	int arglen = strlen(arg);
+	char *arg_head = arg;
+
+	/*needs facilities for parsing negatives*/
+	/*begin the parsing*/
+	if(isdigit(*arg))
+	{
+		while(isdigit(*arg)) arg++;
+		if(*arg == '.')
+		{
+			arg++;
+		}
+		else
+		{
+			return -1;
+		}
+		while(isdigit(*arg)) arg++;
+		if(*arg != '\0')
+		{
+			return -1;
+		}
+		else
+		{
+			return NUMBER;
+		}
+	}
+	
 	return 0;
 }
 	
