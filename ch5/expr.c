@@ -19,25 +19,27 @@ static double *stack_p = stack;
 
 int main(int argc, char *argv[])
 {
-	char * arg_p;
+	char *arg_p;
 	int parsed_arg;
+	double hold;
+
 	if(argc == 1)
 	{
-		/*this isn't an entirly correct error message*/
+		/*this isn't an entirely correct error message*/
 		printf("expr should be called as 'expr <arg>|<op> ... <arg>|<op>\n'");
 		return 1;
 	}
-
-	arg_p = argv+1;/*set to first argument*/
-	double hold;
+	
 	/*I'll break this into functions later*/
-	do
+	printf("Evaluating expression\n");
+	while(--argc > 0)
 	{
-		parsed_arg = parsearg(arg_p);
+		parsed_arg = parsearg(*++argv);
+		printf("%f\n", strtod(*argv));
 		switch(parsed_arg)
 		{
 			case NUMBER:
-				push(strtod(arg_p));
+				push(strtod(*argv));
 				break;
 			case '*':
 				push(pop() * pop());
@@ -54,17 +56,18 @@ int main(int argc, char *argv[])
 				push(pop() - hold);
 				break;
 			default:
-				printf("Error: parsing argument failed %s\n", arg_p);
+				printf("Error: parsing argument failed %s\n", *argv);
 				return -1;
 		}
 	}
-	while(arg_p != argv + (argc + 1))
-	
+	/*print whatever pops from the stack*/
+	printf("Result -> %f\n", pop());
 	return 0; /*Everything went smoothly*/
 }
 
 double pop()
 {
+	printf("pop called\n");
 	if(stack != stack_p)
 		return *stack_p--; /*idk if this'll work*/
 	/*god-awful error handling*/
@@ -74,6 +77,7 @@ double pop()
 
 void push(double new)
 {
+	printf("push called with arg %f\n", new);
 	if(stack_p != stack+STACK_MAX)
 	{
 		*++stack_p = new;
@@ -85,6 +89,7 @@ void push(double new)
 
 int parsearg(char *arg)
 {
+	printf("parsing arg %s\n", arg);
 	int arglen = strlen(arg);
 	char *arg_head = arg;
 
@@ -92,12 +97,14 @@ int parsearg(char *arg)
 	/*begin the parsing*/
 	if(isdigit(*arg))
 	{
+		printf("it's a digit\n");
 		while(isdigit(*arg)) arg++;
 		if(*arg == '.')
 		{
+			printf("it has a fractional part\n");
 			arg++;
 		}
-		else
+		else if(*arg != '\0')
 		{
 			return -1;
 		}
@@ -106,13 +113,16 @@ int parsearg(char *arg)
 		{
 			return -1;
 		}
-		else
-		{
-			return NUMBER;
-		}
+		return NUMBER;
 	}
-	
-	return 0;
+	else if(strlen(arg) == 1)
+	{
+		return *arg; /*return the operator char*/
+	}
+	else
+	{
+		return -1;
+	}	
 }
 	
 
