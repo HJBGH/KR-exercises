@@ -37,12 +37,7 @@ int main(int argc, char *argv[])
 	printf("Evaluating expression\n");
 	while(--argc > 0)
 	{
-		printf("argc -> %d\n", argc);
 		parsed_arg = parsearg(*++argv);
-		printf("argv -> %s\n", *argv);
-		printf("atof(*argv) -> %f\n", atof(*argv));
-		printf("*argp -> %c\n", *arg_p);
-		printf("argv -> %s\n", *argv);
 		switch(parsed_arg)
 		{
 			case NUMBER:

@@ -14,8 +14,10 @@
 #define LINE_LENGTH 128
 #define MAX_TABSTOPS 64
 #define BASE_TEN 10
+#define MIN_ARGS 1
 
 unsigned long tabstops[MAX_TABSTOPS];
+static int have_args = 0;
 
 int getline(char line[], int ll);
 int detabline(char line[]); /*does detab operations until it encounters EOF or \n*/
@@ -26,10 +28,22 @@ int main(int argc, char *argv[])
 {
 	char line[LINE_LENGTH];
 	int len;
+	have_args = argc;
+	if(have_args > MIN_ARGS)
+	{
+		printf("Calling parseargs\n");
+		if(parseargs(argc, argv) != 0)
+		{
+			printf("Error, bad arguments provided to detab\n");
+			return 1;/* I know I should use something like exit(0) but I'm
+			not familiar with those conventions*/
+		}
+	}
+	/*	
 	while((len = getline(line, LINE_LENGTH)) > 0)
 	{
 		detabline(line);
-	}
+	}*/
 	return 0;
 }
 
@@ -37,6 +51,7 @@ int main(int argc, char *argv[])
 int parseargs(int argc, char *argv[])
 {
 	/*parse the arguments, convert and validate them*/
+	printf("called parseargs\n");
 	int i = 1;
 	errno = 0;
 	unsigned long tab;
@@ -44,7 +59,9 @@ int parseargs(int argc, char *argv[])
 	while(i != MAX_TABSTOPS && argc != 0)
 	{
 		errno = 0; /*reset errno before we call strtoul*/
-		tab = strtoul(argv[i], &endp, BASE_TEN);	
+		printf("About to call strtoul\n");
+		tab = strtoul(*(argv+i), &endp, BASE_TEN);	
+		printf("Survived strtoul!\n");
 		/*I can check for errors by inspecting the contents of *endp*/
 		if(errno != 0 || *endp != '\0' || (errno != 0 && tab == 0))
 		{
