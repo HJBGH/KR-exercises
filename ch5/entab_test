@@ -1,0 +1,6 @@
+start;
+|   |     |              <--various spaces
+	|	|	|			|<-- 3*1 tab and 3 tabs
+                        |<-- spaces
+####|	|###|###########|<--ruler
+end;
