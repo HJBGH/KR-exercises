@@ -9,11 +9,13 @@
 /*This doesn't handle backspace control chars '\b' at the moment*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #define TAB_COLUMNS 4
 #define LINE_LENGTH 128
 #define MAX_TABSTOPS 64
+#define BASE_TEN 10
 
-int tabstops[MAX_TABSTOPS];
+unsigned long tabstops[MAX_TABSTOPS];
 
 int getline(char line[], int ll);
 int detabline(char line[]); /*does detab operations until it encounters EOF or \n*/
@@ -34,7 +36,23 @@ int main(int argc, char *argv[])
 /*returns -1 on error*/
 int parseargs(int argc, char *argv[])
 {
-	/*TODO, parse the arguments*/
+	/*parse the arguments, convert and validate them*/
+	int i = 1;
+	errno = 0;
+	unsigned long tab;
+	char *endp;
+	while(i != MAX_TABSTOPS && argc != 0)
+	{
+		errno = 0; /*reset errno before we call strtoul*/
+		tab = strtoul(argv[i], &endp, BASE_TEN);	
+		/*I can check for errors by inspecting the contents of *endp*/
+		if(errno != 0 || *endp != '\0' || (errno != 0 && tab == 0))
+		{
+			/*It's gone wrong*/
+			return -1;
+		}
+		tabstops[i] = tab;
+	}
 	return 0;
 }
 	
@@ -58,7 +76,7 @@ int getline(char line[], int ll)
 /*An unfortunate consequence of converting all tab chars to the equivalent
  * number of space chars is that it increases the size of the line in terms of
  * memory space by an uncomfortable amount*/
-int detabline(char line[], )
+int detabline(char line[])
 {
 	/*used to construct the version of the line with the tabs replaced*/
 	int i, j, k;
