@@ -34,12 +34,14 @@ int main(int argc, char *argv[])
 	printf("Evaluating expression\n");
 	while(--argc > 0)
 	{
+		printf("argc -> %d\n", argc);
 		parsed_arg = parsearg(*++argv);
-		printf("%f\n", strtod(*argv));
+		printf("argv -> %s\n", *argv);
+		printf("%f\n", strtod(*argv, &arg_p));
 		switch(parsed_arg)
 		{
 			case NUMBER:
-				push(strtod(*argv));
+				push(strtod(*argv, &arg_p));
 				break;
 			case '*':
 				push(pop() * pop());
@@ -113,10 +115,12 @@ int parsearg(char *arg)
 		{
 			return -1;
 		}
+		printf("returning NUMBER signal\n");
 		return NUMBER;
 	}
 	else if(strlen(arg) == 1)
 	{
+		printf("returning operator\n");
 		return *arg; /*return the operator char*/
 	}
 	else
