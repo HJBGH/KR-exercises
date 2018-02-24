@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #define STACK_MAX 128
 #define NUMBER '0' /*signal passed from parsearg to main to signal that an arg
 is a number*/
@@ -19,7 +20,8 @@ static double *stack_p = stack;
 
 int main(int argc, char *argv[])
 {
-	char *arg_p;
+	char plbt = 'b';
+	char *arg_p = &plbt;
 	int parsed_arg;
 	double hold;
 
@@ -31,13 +33,16 @@ int main(int argc, char *argv[])
 	}
 	
 	/*I'll break this into functions later*/
+	printf("TEST\n%f\nEND TEST\n", strtod("444.333", &arg_p));
 	printf("Evaluating expression\n");
 	while(--argc > 0)
 	{
 		printf("argc -> %d\n", argc);
 		parsed_arg = parsearg(*++argv);
 		printf("argv -> %s\n", *argv);
-		printf("%f\n", strtod(*argv, &arg_p));
+		printf("atof(*argv) -> %f\n", atof(*argv));
+		printf("*argp -> %c\n", *arg_p);
+		printf("argv -> %s\n", *argv);
 		switch(parsed_arg)
 		{
 			case NUMBER:
