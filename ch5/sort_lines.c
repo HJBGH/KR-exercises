@@ -24,12 +24,14 @@ char *lineptr[MAXLINES]; /*pointers to text lines*/
 int readlines(char *lineptr[], int nlines);
 void writelines(char *lineptr[], int nlines);
 
+
 void hb_qsort(void *lineptr[], int left, int right, int (*comp)(void *, void *));
 
 int numcmp(char *, char *);
 
 static int reverse_flag = 0;/*swap function to determin swap order*/
 /*main routine organises it all, sorts input lines*/
+static int no_case_flag = 0;
 int main(int argc, char *argv[])
 {
 	int nlines, i;
@@ -49,6 +51,7 @@ int main(int argc, char *argv[])
 				{
 					case 'n': numeric = 1; break;
 					case 'r': reverse_flag = 1; break;
+					case 'f': no_case_flag = 1; break;
 					default:
 						printf("Error unrecognized arguments\n");
 						return -1;
@@ -119,6 +122,10 @@ void writelines(char * lineptr[], int nlines)
 /*sort v[left]...v[right] into increasing order*/
 void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
 {
+	/*NOTE ON IGNORING CASE:
+	 * Add two member variables to hb_qsort that will be used to contain
+	 * lowercase verstions of the strings for comparison in the appropriate
+	 * flag is set*/
 	int i, last;
 	void swap(void *v[], int i, int j);/*nested function prototype?*/
 	
