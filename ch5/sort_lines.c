@@ -131,9 +131,19 @@ void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
 	last = left;
 	for(i = left+1; i <= right; i++)
 	{
-		if((*comp)(v[i], v[left]) < 0)
+		if(reverse_flag)
 		{
-			swap(v, ++last, i);
+			if((*comp)(v[i], v[left]) > 0)
+			{
+				swap(v, ++last, i);
+			}
+		}
+		else
+		{
+			if((*comp)(v[i], v[left]) < 0)
+			{
+				swap(v, ++last, i);
+			}
 		}
 	}
 	swap(v, left, last);
