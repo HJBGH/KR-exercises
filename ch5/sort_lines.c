@@ -1,5 +1,7 @@
 /*This file contains the program outlined on pages 108-110 of K & R, with the
  * readline subroutine modified according to the suggestions in exercise 5-7*/
+/*Modifications have been made to this program in accordance with the suggestions
+ * outlined in exercises 5-14 through 5-17*/
 /*note that I haven't actually measured the runtime difference, but I have 
  * googled the exercise as included some notes*/
 /*As it stands I don't think either method of managing memory produces much
@@ -31,21 +33,28 @@ static int reverse_flag = 0;/*swap function to determin swap order*/
 int main(int argc, char *argv[])
 {
 	int nlines, i;
+	char *arg_char;
 	int numeric = 0;
 
 	printf("argc -> %d\n", argc);
+	/*this isn't very good argument parsing*/
 	for(i = 1; i < argc; i++)
 	{
 		if(*argv[i] == '-')/*array indexing has a higher priority than deref op*/
 		{
-			switch(*(argv[i] + 1))
+			arg_char = argv[i]+1;
+			while(*arg_char != '\0')
 			{
-				case 'n': numeric = 1; break;
-				case 'r': reverse_flag = 1; break;
-				default:
-					printf("Error unrecognized arguments\n");
-					return -1;
-			}
+				switch(*arg_char)
+				{
+					case 'n': numeric = 1; break;
+					case 'r': reverse_flag = 1; break;
+					default:
+						printf("Error unrecognized arguments\n");
+						return -1;
+				}
+				arg_char++;
+			}	
 		}
 	}
 	if(reverse_flag) printf("REVERSE SET\n");
