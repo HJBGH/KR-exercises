@@ -26,16 +26,29 @@ void hb_qsort(void *lineptr[], int left, int right, int (*comp)(void *, void *))
 
 int numcmp(char *, char *);
 
+static int reverse_flag = 0;/*swap function to determin swap order*/
 /*main routine organises it all, sorts input lines*/
 int main(int argc, char *argv[])
 {
-	int nlines;
+	int nlines, i;
 	int numeric = 0;
 
-	if(argc > 1 && strcmp(argv[1], "-n") == 0)
+	printf("argc -> %d\n", argc);
+	for(i = 1; i < argc; i++)
 	{
-		numeric = 1;
+		if(*argv[i] == '-')/*array indexing has a higher priority than deref op*/
+		{
+			switch(*(argv[i] + 1))
+			{
+				case 'n': numeric = 1; break;
+				case 'r': reverse_flag = 1; break;
+				default:
+					printf("Error unrecognized arguments\n");
+					return -1;
+			}
+		}
 	}
+	if(reverse_flag) printf("REVERSE SET\n");
 	if((nlines = readlines(lineptr, MAXLINES)) >= 0)
 	{
 		hb_qsort((void **) lineptr, 0, nlines-1,
@@ -97,13 +110,11 @@ void writelines(char * lineptr[], int nlines)
 /*sort v[left]...v[right] into increasing order*/
 void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
 {
-	printf("quicksorting\n");
 	int i, last;
 	void swap(void *v[], int i, int j);/*nested function prototype?*/
 	
 	if(left >= right)/*Array has fewer tha 2 elements*/
 	{
-		printf("done here\n");
 		return;
 	}
 
