@@ -8,36 +8,46 @@
  * heap memory would be fast I think, as heap memory would have to be assigned
  * by the OS during runtime*/
 #include <stdio.h>
-#include <string.h>
+#include <string.h>/*case insensitive strcmp, not portable*/
+#include <stdlib.h>
+
 
 
 #define ALLOCSIZE 10000 /*size of available space*/
 #define MAXLINES 5000
 #define MAXLEN 100
 
-char * lineptr[MAXLINES]; /*pointers to text lines*/
+char *lineptr[MAXLINES]; /*pointers to text lines*/
 
-int readlines(char * lineptr[], int nlines, char * lines);
-void writelines(char * lineptr[], int nlines);
+int readlines(char *lineptr[], int nlines);
+void writelines(char *lineptr[], int nlines);
 
-void qsort(char * lineptr[], int left, int right);
+void hb_qsort(void *lineptr[], int left, int right, int (*comp)(void *, void *));
+
+int numcmp(char *, char *);
 
 /*main routine organises it all, sorts input lines*/
-int main()
+int main(int argc, char *argv[])
 {
 	int nlines;
-	char lines[ALLOCSIZE];
+	int numeric = 0;
 
-	if((nlines = readlines(lineptr, MAXLINES, lines)) >= 0)
+	if(argc > 1 && strcmp(argv[1], "-n") == 0)
 	{
-		qsort(lineptr, 0, nlines-1);
+		numeric = 1;
+	}
+	if((nlines = readlines(lineptr, MAXLINES)) >= 0)
+	{
+		hb_qsort((void **) lineptr, 0, nlines-1,
+				(numeric ? (int (*)(void*, void*))numcmp : 
+				(int (*)(void*, void*))strcmp));
 		writelines(lineptr, nlines);
 		printf("Number of lines -> %d\n", nlines);
 		return 0;
 	}
 	else
 	{
-		printf("Error: input to big to sort\n");
+		printf("Error: input too big to sort\n");
 		return 1;
 	}
 }
@@ -46,30 +56,28 @@ int getline(char * s, size_t n);
 char * alloc(int); /*custom memory allocation routine*/
 
 /*readlines: read input lines*/
-int readlines(char * lineptr[], int maxlines, char * lines)
+int readlines(char *lineptr[], int maxlines)
 {
 	int len, nlines;
 	char *p, line[MAXLEN];
-	static char * lines_p = NULL;
+	/*static char * lines_p = NULL;
 
 	if(lines_p == NULL)
 	{
 		lines_p = lines;
-	}
+	}*/
 	nlines = 0;
 	while((len = getline(line, MAXLEN)) > 0)
 	{
-		if(nlines >= maxlines || (lines_p + len) >= lines + ALLOCSIZE )
+		if(nlines >= maxlines || (p = alloc(len)) == NULL)
 		{
 			return -1;
 		}
 		else
 		{
 			line[len-1] = '\0'; /*delete newline*/
-			strcpy(lines_p, line);
-			printf("got line -> %s\n", lines_p);
-			lineptr[nlines++] = lines_p;
-			lines_p += len;
+			strcpy(p, line);
+			lineptr[nlines++] = p;
 		}
 	}
 	return nlines;
@@ -78,17 +86,20 @@ int readlines(char * lineptr[], int maxlines, char * lines)
 /*writelines: write output lines*/
 void writelines(char * lineptr[], int nlines)
 {
-	while(nlines-- > 0)
-		printf("%s\n", *lineptr++);
+	int i;
+	for(i = 0; i < nlines; i++)
+	{
+		printf("%s\n", lineptr[i]);
+	}
 }
 
 /*recursive quicksort*/
 /*sort v[left]...v[right] into increasing order*/
-void qsort(char *v[], int left, int right)
+void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
 {
 	printf("quicksorting\n");
 	int i, last;
-	void swap(char *v[], int i, int j);/*nested function prototype?*/
+	void swap(void *v[], int i, int j);/*nested function prototype?*/
 	
 	if(left >= right)/*Array has fewer tha 2 elements*/
 	{
@@ -100,19 +111,32 @@ void qsort(char *v[], int left, int right)
 	last = left;
 	for(i = left+1; i <= right; i++)
 	{
-		if(strcmp(v[i], v[left]) < 0)
+		if((*comp)(v[i], v[left]) < 0)
 		{
 			swap(v, ++last, i);
 		}
 	}
 	swap(v, left, last);
-	qsort(v, left, last-1);
-	qsort(v, last+1, right);
+	hb_qsort(v, left, last-1, comp);
+	hb_qsort(v, last+1, right, comp);
 }
-	
-void swap(char *v[], int i, int j)
+
+int numcmp(char *s1, char *s2)
 {
-	char * temp;
+	double v1, v2;
+	v1 = atof(s1);
+	v2 = atof(s2);
+	if (v1 < v2)
+		return -1;
+	else if(v1 > v2)
+		return 1;
+	else 
+		return 0;
+}
+
+void swap(void *v[], int i, int j)
+{
+	void * temp;
 	temp = v[i];
 	v[i] = v[j];
 	v[j] = temp;
