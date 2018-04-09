@@ -12,23 +12,23 @@ int hb_strncmp(const char * s, const char * t, size_t n);
 
 int main()
 {
-	/*TODO: write tests*/
-	printf("This should be zero ->\t%d\n", hb_strncmp("implore", "imply", 3));
-	printf("This should be > zero ->\t%d\n", hb_strncmp("abelone", "zebra", 3));
-	printf("This should be < zero ->\t%d\n", hb_strncmp("zone", "aleph", 2));
-	return 0;
+    /*TODO: write tests*/
+    printf("This should be zero ->\t%d\n", hb_strncmp("implore", "imply", 3));
+    printf("This should be > zero ->\t%d\n", hb_strncmp("abelone", "zebra", 3));
+    printf("This should be < zero ->\t%d\n", hb_strncmp("zone", "aleph", 2));
+    return 0;
 }
 
 int hb_strncmp(const char * s, const char * t, size_t n)
 {
-	int result;	
-	for(n; n > 0; n--)
-	{
-		result = *t++ - *s++;
-		if(result != 0)
-			return result;
-		
-	}
+    int result; 
+    for(n; n > 0; n--)
+    {
+        result = *t++ - *s++;
+        if(result != 0)
+            return result;
+        
+    }
 
-	return 0; /*default case*/
+    return 0; /*default case*/
 }
