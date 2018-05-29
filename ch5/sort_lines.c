@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>/*case insensitive strcmp, not portable*/
 #include <stdlib.h>
+#include <ctype.h>
 
 
 
@@ -30,7 +31,7 @@ void hb_qsort(void *lineptr[], int left, int right, int (*comp)(void *, void *))
 int numcmp(char *, char *);
 int caseless_strcmp(const char *, const char *);
 
-static int reverse_flag = 0;/*swap function to determin swap order*/
+static int reverse_flag = 0;/*swap function to determine swap order*/
 /*main routine organises it all, sorts input lines*/
 static int no_case_flag = 0;
 int main(int argc, char *argv[])
@@ -65,9 +66,11 @@ int main(int argc, char *argv[])
     {   
         /*TODO: use the flags to set the comparison function pointer
          * earlier, then pass it into the qsort*/
+        int(*picked_strcmp)(void *, void *) = 
+                (no_case_flag ? (int (*)(void*, void*))caseless_strcmp :
+                                (int (*)(void*, void*))strcmp);
         hb_qsort((void **) lineptr, 0, nlines-1,
-                (numeric ? (int (*)(void*, void*))numcmp : 
-                (int (*)(void*, void*))strcmp));
+                (numeric ? (int (*)(void*, void*))numcmp : picked_strcmp));
         writelines(lineptr, nlines);
         printf("Number of lines -> %d\n", nlines);
         return 0;
@@ -155,11 +158,21 @@ void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
     hb_qsort(v, last+1, right, comp);
 }
 
-int numcmp(const char *s1, const char *s2)
+int numcmp(char *s1, char *s2)
 {
     double v1, v2;
-    v1 = atof(s1);
-    v2 = atof(s2);
+    if(no_case_flag)
+    {
+        unsigned char lv1 = (unsigned char) tolower(*s1);
+        unsigned char lv2 = (unsigned char) tolower(*s2);
+        v1 = atof(&lv1);
+        v2 = atof(&lv2);
+    }
+    else
+    {
+        v1 = atof(s1);
+        v2 = atof(s2);
+    }
     if (v1 < v2)
         return -1;
     else if(v1 > v2)
@@ -219,21 +232,20 @@ int getline(char * s, size_t n)
 
 int caseless_strcmp(const char *p1, const char *p2)
 {
-    /*I'm modifying code from glibc string library, there's
-     * this weird bit which goes as follows:*/
+    /* I'm modifying code from glibc string library, there's
+     * this weird bit which goes as follows: */
     const unsigned char *s1 = (const unsigned char *) p1;
     const unsigned char *s2 = (const unsigned char *) p2;
     unsigned char c1, c2;
-     /*I'm fairly certain this odd declaration
-      * is some form of input sanitization*/
-
+     /* I'm fairly certain this odd declaration
+      * is some form of input sanitization */
     do
     {
-        c1 = (unsigned char) toLower(*s1++);
-        c2 = (unsigned char) toLower(*s2++);
+        c1 = (unsigned char) tolower(*s1++);
+        c2 = (unsigned char) tolower(*s2++);
         if(c1 == '\0')
             return c1 - c2;
-    }while(c1 == c2);
-
+    }
+    while(c1 == c2);
     return c1 - c2;
 }
