@@ -34,6 +34,9 @@ int caseless_strcmp(const char *, const char *);
 static int reverse_flag = 0;/*swap function to determine swap order*/
 /*main routine organises it all, sorts input lines*/
 static int no_case_flag = 0;
+static int dir_order_flag = 0;/*order only by considering letters, numbers and
+blanks*/
+
 int main(int argc, char *argv[])
 {
     int nlines, i;
@@ -54,8 +57,9 @@ int main(int argc, char *argv[])
                     case 'n': numeric = 1; break;
                     case 'r': reverse_flag = 1; break;
                     case 'f': no_case_flag = 1; break;
+                    case 'd': dir_order_flag = 1; break;
                     default:
-                        printf("Error unrecognized arguments\n");
+                        printf("Error: unrecognized arguments\n");
                         return -1;
                 }
                 arg_char++;
@@ -233,7 +237,8 @@ int getline(char * s, size_t n)
 int caseless_strcmp(const char *p1, const char *p2)
 {
     /* I'm modifying code from glibc string library, there's
-     * this weird bit which goes as follows: */
+     * this bit, which is for casting the signed const char pointer args to
+     * unsigned const char pointers*/
     const unsigned char *s1 = (const unsigned char *) p1;
     const unsigned char *s2 = (const unsigned char *) p2;
     unsigned char c1, c2;
