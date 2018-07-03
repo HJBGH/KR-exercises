@@ -24,11 +24,11 @@ char *lineptr[MAXLINES]; /*pointers to text lines*/
 
 int readlines(char *lineptr[], int nlines);
 void writelines(char *lineptr[], int nlines);
-
+char * dirOrderHelper(char *vi, char *c1);
 
 void hb_qsort(void *lineptr[], int left, int right, int (*comp)(void *, void *));
 
-int numcmp(char *, char *);
+int numcmp(const char *, const char *);
 int caseless_strcmp(const char *, const char *);
 
 static int reverse_flag = 0;/*swap function to determine swap order*/
@@ -122,6 +122,26 @@ void writelines(char * lineptr[], int nlines)
     }
 }
 
+/*This dumb function is used to turn regular strings into directory names for
+ * comparison according to directory order.*/
+char * dirOrderHelper(char *vi, char *c1)
+{
+    /*initialize *vi elsewhere, avoid side effects*/
+    while(*c1 != '\0')
+    {
+        if(*c1 == '\t' || *c1 == '\n' || *c1 == ' ' || (*c1 >= '0' && *c1<='9')
+            || (*c1 >= 'a' && *c1 <= 'z') || (*c1 >= 'A' && *c1 <= 'Z'))
+        {
+            *vi = *c1;
+            vi++;
+        }
+        c1++;
+    }
+    vi++;
+    *vi = '\0';
+    return vi;
+}
+
 /*recursive quicksort*/
 /*sort v[left]...v[right] into increasing order*/
 void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
@@ -132,7 +152,10 @@ void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
      * flag is set*/
     int i, last;
     void swap(void *v[], int i, int j);/*nested function prototype?*/
-    
+    char * s1;
+    char * s2;
+    char dirBuf[MAXLEN]; 
+
     if(left >= right)/*Array has fewer tha 2 elements*/
     {
         return;
@@ -142,16 +165,24 @@ void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
     last = left;
     for(i = left+1; i <= right; i++)
     {
+        /*this is where I should call the directory order name conversion*/ 
+        s1 = v[i];
+        s2 = v[left];
+        if(dir_order_flag)
+        {
+           s1 = dirOrderHelper(dirBuf, s1);
+           s2 = dirOrderHelper(dirBuf, s2);
+        }
         if(reverse_flag)/*If we're sorting into reverse order*/
         {
-            if((*comp)(v[i], v[left]) > 0)
+            if((*comp)(s1, s2) > 0)
             {
                 swap(v, ++last, i);
             }
         }
         else
         {
-            if((*comp)(v[i], v[left]) < 0)
+            if((*comp)(s1, s2) < 0)
             {
                 swap(v, ++last, i);
             }
@@ -162,13 +193,13 @@ void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
     hb_qsort(v, last+1, right, comp);
 }
 
-int numcmp(char *s1, char *s2)
+int numcmp(const char *s1, const char *s2)
 {
     double v1, v2;
     if(no_case_flag)
     {
-        unsigned char lv1 = (unsigned char) tolower(*s1);
-        unsigned char lv2 = (unsigned char) tolower(*s2);
+        const unsigned char lv1 = (const unsigned char) tolower(*s1);
+        const unsigned char lv2 = (const unsigned char) tolower(*s2);
         v1 = atof(&lv1);
         v2 = atof(&lv2);
     }
