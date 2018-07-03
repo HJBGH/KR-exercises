@@ -127,6 +127,8 @@ void writelines(char * lineptr[], int nlines)
 char * dirOrderHelper(char *vi, char *c1)
 {
     /*initialize *vi elsewhere, avoid side effects*/
+    //printf("c1 TEST PRINT > %s\n", c1);
+    char * vi_start = vi;
     while(*c1 != '\0')
     {
         if(*c1 == '\t' || *c1 == '\n' || *c1 == ' ' || (*c1 >= '0' && *c1<='9')
@@ -137,24 +139,22 @@ char * dirOrderHelper(char *vi, char *c1)
         }
         c1++;
     }
-    vi++;
+    //vi++;
     *vi = '\0';
-    return vi;
+    //printf("vi TEST PRINT > %s\n", vi_start);
+    return vi_start;
 }
 
 /*recursive quicksort*/
 /*sort v[left]...v[right] into increasing order*/
 void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
 {
-    /*NOTE ON IGNORING CASE:
-     * Add two member variables to hb_qsort that will be used to contain
-     * lowercase versions of the strings for comparison in the appropriate
-     * flag is set*/
     int i, last;
     void swap(void *v[], int i, int j);/*nested function prototype?*/
     char * s1;
     char * s2;
-    char dirBuf[MAXLEN]; 
+    char dirBuf[MAXLEN];
+    char sndDirBuf[MAXLEN];
 
     if(left >= right)/*Array has fewer tha 2 elements*/
     {
@@ -170,9 +170,12 @@ void hb_qsort(void *v[], int left, int right, int (*comp)(void *, void *))
         s2 = v[left];
         if(dir_order_flag)
         {
-           s1 = dirOrderHelper(dirBuf, s1);
-           s2 = dirOrderHelper(dirBuf, s2);
+           s1 = dirOrderHelper(dirBuf, v[i]);
+           s2 = dirOrderHelper(sndDirBuf, v[left]);
+           //printf("TEST PRINT > %s\n%s", s1, s2);
         }
+        printf("s1: %s\n", s1);
+        printf("s2: %s\n", s2);
         if(reverse_flag)/*If we're sorting into reverse order*/
         {
             if((*comp)(s1, s2) > 0)

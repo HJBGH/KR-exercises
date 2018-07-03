@@ -1,3 +1,5 @@
+!@#$%^&*&^%$#$%^&
+#a#b#c#d#e#f#g^h*i(j)k;
 0
 -15000000000000000000000000
 read all the lines of input
@@ -7,6 +9,7 @@ sort them
 print them in order
 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 1234567890
+12345###$$$abCD
 this is a test line that is the longest line containing words.
 this is another test line.
 short
@@ -17,7 +20,6 @@ zzzzzzzzzzzzzzz
 ZZZZZZZZZZZZZZZZZZZZ
 XXXXXXXXXXXXXXXXXXX
 YYYYYYYYYYYYYYYYYY
-
 zzzzzzzzzzzzzzzzzzzebra
 #$%^&*(
 0.00000000000001
