@@ -6,11 +6,14 @@
 
 #define MAXTOKEN 100
 #define BUFSIZE 100 /*character limit on ungetch buffer*/
-
+#define FALSE 0
+#define TRUE 1
 enum {NAME, PARENS, BRACKETS};
 
 /*support functions*/
 int gettoken();
+
+int error = FALSE;
 int tokentype;
 char token[MAXTOKEN];
 char name[MAXTOKEN];
@@ -30,12 +33,26 @@ int main(int argc, char *argv[])
         /*1st token on a the line*/
         strcpy(datatype, token);
         out[0] = '\0';
+        printf("pre parse sanity print.\n");
+        printf("token: %s\n", token);
+        printf("name: %s\n", name);
+        printf("datatype: %s\n", datatype);
+
         dcl(); /*parse the rest of the line*/
-        if(tokentype != '\n')
-        {
+
+        if(error != FALSE)
+        {            
             printf("syntax error\n");
+            /*I need to reset all the buffers and variables in here*/
         }
-        printf("%s: %s %s\n", name, out, datatype);
+        else
+        {
+            printf("declaration -> %s: %s %s\n", name, out, datatype);
+        } 
+        printf("post parse sanity print.\n");
+        printf("token: %s\n", token);
+        printf("name: %s\n", name);
+        printf("datatype: %s\n", datatype);
     }
     return 0;
 }
@@ -53,6 +70,7 @@ void dcl(void)
 
 void dirdcl(void)
 {
+    printf("dirdcl called\n");
     int type;
     
     /*each of these if/else statements represents a fork in the grammar*/
@@ -61,7 +79,10 @@ void dirdcl(void)
         /* (dcl) */
         dcl();
         if(tokentype != ')')
+        {
+            error = TRUE;
             printf("error: missing ')' \n");
+        }
     }
     else if(tokentype == NAME) 
     { 
@@ -71,6 +92,11 @@ void dirdcl(void)
     else
     {
         printf("error: expected name or (dcl)\n");
+        error = TRUE;
+        if(tokentype == '\n')
+        {
+            return;/*prevent redundant calls to gettoken() causing hangs*/
+        }
     }
     while ((type = gettoken()) == PARENS || type == BRACKETS)
     {
@@ -85,12 +111,14 @@ void dirdcl(void)
             strcat(out, " of");
         }
     }
+    /*printf("returning from dirdcl\n");*/
 }
 
 /*need to re-declare getch and ungetch*/
 
 int gettoken(void)
 {
+    /*printf("gettoken called\n");*/
     int c, getch(void);
     void ungetch(int);
     char * p = token;
@@ -128,6 +156,9 @@ int gettoken(void)
     }
     else
     {
+        printf("returning unrecognized token\n");
+        if(c = '\n')
+            printf("it's a newline char\n");
         return tokentype = c;
     }
 }
@@ -138,6 +169,8 @@ int bufp = 0;
 /*get a char from input or from the pushback buffer*/
 int getch(void)
 {
+    /*printf("getch called\n");
+    printf("bufp: %d\n", bufp);*/
     return (bufp > 0) ? buf[--bufp] : getchar();
 }
 
