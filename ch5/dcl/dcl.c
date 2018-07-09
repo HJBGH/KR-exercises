@@ -12,6 +12,8 @@ enum {NAME, PARENS, BRACKETS};
 
 /*support functions*/
 int gettoken();
+int getch(void);
+void ungetch(int);
 
 int error = FALSE;
 int tokentype = -1;/*initialize this to avoid fuckery*/
@@ -62,16 +64,17 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+/*this can't detect invalid declarations that look like *function()*/
 void dcl(void)
 {
+    printf("dcl called\n");
     int ns;
+    /*the evaluation fucks this over, the second part doesn't
+     * get evaluated if the first part is true*/
+    ns = 0;
+    if(tokentype == '*') ns++;
+    while(gettoken() == '*') ns++;
 
-    for(ns = 0; gettoken() == '*';)
-    {
-        /*count asterixes*/
-        printf("counting asterix\n");
-        ns++;
-    }
     dirdcl();
     while(ns-- > 0)
         strcat(out, " pointer to");
@@ -91,6 +94,7 @@ void dirdcl(void)
         {
             error = TRUE;
             printf("error: missing ')' \n");
+            if(tokentype == '\n') return;
         }
     }
     else if(tokentype == NAME) 
@@ -128,8 +132,7 @@ void dirdcl(void)
 int gettoken(void)
 {
     printf("gettoken called\n");
-    int c, getch(void);
-    void ungetch(int);
+    int c;
     char * p = token;
 
     while((c = getch()) == ' ' || c == '\t') printf("eating whitespace\n")
@@ -161,6 +164,7 @@ int gettoken(void)
 
         *p = '\0';
         ungetch(c);
+        printf("returning name\n");
         return tokentype = NAME;
     }
     else
@@ -168,6 +172,9 @@ int gettoken(void)
         printf("returning unrecognized token\n");
         if(c == '\n')
             printf("it's a newline char\n");
+        else
+            printf("%c\n", c);
+        *p='\0'; /*reset token var*/
         return tokentype = c;
     }
 }
