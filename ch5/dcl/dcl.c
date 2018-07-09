@@ -14,7 +14,7 @@ enum {NAME, PARENS, BRACKETS};
 int gettoken();
 
 int error = FALSE;
-int tokentype;
+int tokentype = -1;/*initialize this to avoid fuckery*/
 char token[MAXTOKEN];
 char name[MAXTOKEN];
 char datatype[MAXTOKEN];
@@ -31,12 +31,15 @@ int main(int argc, char *argv[])
     while(gettoken() != EOF)
     {
         /*1st token on a the line*/
+        printf("---------------\n");
         strcpy(datatype, token);
         out[0] = '\0';
+        error = FALSE;
         printf("pre parse sanity print.\n");
         printf("token: %s\n", token);
         printf("name: %s\n", name);
         printf("datatype: %s\n", datatype);
+        printf("tokentype: %d\n", tokentype);
 
         dcl(); /*parse the rest of the line*/
 
@@ -53,6 +56,8 @@ int main(int argc, char *argv[])
         printf("token: %s\n", token);
         printf("name: %s\n", name);
         printf("datatype: %s\n", datatype);
+        printf("tokentype: %d\n", tokentype);
+        printf("end of parse ----\n");
     }
     return 0;
 }
@@ -61,8 +66,12 @@ void dcl(void)
 {
     int ns;
 
-    for(ns = 0; gettoken() == '*';) /*count asterixes*/
+    for(ns = 0; gettoken() == '*';)
+    {
+        /*count asterixes*/
+        printf("counting asterix\n");
         ns++;
+    }
     dirdcl();
     while(ns-- > 0)
         strcat(out, " pointer to");
@@ -118,12 +127,12 @@ void dirdcl(void)
 
 int gettoken(void)
 {
-    /*printf("gettoken called\n");*/
+    printf("gettoken called\n");
     int c, getch(void);
     void ungetch(int);
     char * p = token;
 
-    while((c = getch()) == ' ' || c == '\t')
+    while((c = getch()) == ' ' || c == '\t') printf("eating whitespace\n")
         ;
     if(c == '(')
     {
@@ -157,7 +166,7 @@ int gettoken(void)
     else
     {
         printf("returning unrecognized token\n");
-        if(c = '\n')
+        if(c == '\n')
             printf("it's a newline char\n");
         return tokentype = c;
     }
