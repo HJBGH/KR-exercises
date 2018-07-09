@@ -5,6 +5,8 @@
 /*The code in here handles bad input insufficiently, I don't know how to do
  * error management in C yet*/
 /*due to the mind numbingly dull nature of the exercise 4.8 has been skipped*/
+/*This file contains the RPC as implemented with getline instead of getch and 
+ * ungetch as prescribed by exercise 4-10*/
 
 /*THE ASSIGNMENT OPERATOR EVALUATES RIGHT TO LEFT YOU USELESS JACKASS MORON*/
 
@@ -16,6 +18,7 @@
 
 #define MAXOP 100
 #define BUFSIZE 100
+#define LINE_LEN 128
 #define NUMBER '0'
 #define MEM_LEN 27
 #define MAXVAL 100 /*maximum depth of value stack*/
@@ -30,8 +33,13 @@ int dupe(void);/*ints are to return error codes*/
 void clear(void);
 int swap(void);
 double runfunction(char []);
+int getline(void);
 
 double mem[MEM_LEN]; /*memory indexable by alphabetical characters*/
+char expression[LINE_LEN];
+int exp_p = 0; /*expression position, I'll have to reset this after each 
+use*/
+
 
 /* reverse Polish calculator */
 int main()
@@ -45,32 +53,36 @@ int main()
 	for(i; i<MEM_LEN; i++)
 		mem[i] = 0.0; /*reset memory*/
 
-	while((type = getop(s)) != EOF)
+	while(getline() > 0) /*empty input causes program to exit*/
 	{
-		switch(type)
+		/*call getop here*/
+		printf("evaluating expression\n");
+		while((type = getop(s)) != '\0')
 		{
-			case NUMBER:
+			switch(type)
+			{
+				case NUMBER:
 				push(atof(s));
 				break;
-			case MATH_FUNC:
+				case MATH_FUNC:
 				push(runfunction(s));
 				break;
-			case VAR_NAME:
+				case VAR_NAME:
 				/*how the fuck do i deal with this?*/
 				active_var = s[0] - 'a';
 				push(mem[active_var]);/*takes a variable an puts it on the stack*/
 				break;
-			case '+':
+				case '+':
 				push(pop() + pop());
 				break;
-			case '*':
+				case '*':
 				push(pop() * pop());
 				break;
-			case '-':
+				case '-':
 				op2 = pop();
 				push(pop() - op2);
 				break;
-			case '/':
+				case '/':
 				op2 = pop();
 				if(op2 != 0.0)
 				{
@@ -81,7 +93,7 @@ int main()
 					printf("error: zero divisor\n");
 				}
 				break;
-			case '%':
+				case '%':
 				op2 = pop();
 				if(op2 != 0.0)
 				{
@@ -92,7 +104,7 @@ int main()
 					printf("error: zero divisor\n");
 				}
 				break;
-			case '>': /*setting vars, this doesn't handle bad input well*/
+				case '>': /*setting vars, this doesn't handle bad input well*/
 				getop(s);
 				if(strlen(s) > 1)
 				{
@@ -113,27 +125,28 @@ int main()
 					language*/
 				}
 				break;
-			case '\n':
+				case '\n':
 				printf("\t%.8g\n", pop());
 				break;
-			case 'S': /*S for swap*/
+				case 'S': /*S for swap*/
 				if(swap() != 0)
 					printf("error: not enough stack data to swap\n");
 				break;
-			case 'P':
+				case 'P':
 				if(printtop() != 0)
 					printf("error: nothing to print\n");
 				break;
-			case 'D':
+				case 'D':
 				if(dupe() != 0)
 					printf("error: nothing to duplicate on stack\n");
 				break;
-			case 'C':
+				case 'C':
 				clear();/*no error codes for this one*/
 				break;
-			default:
+				default:
 				printf("error: unknown command %s\n", s);
 				break;
+			}
 		}
 	}
 	return 0;
@@ -187,43 +200,30 @@ double pop(void)
 	}
 }
 
-
-
-/*and now, for your enjoyment, i/o funtion prototypes*/
-int getch(void); /*getch as in get-char*/
-void ungetch(int);
-
 /*getop: get next operator, numeric operand, function call or variable,
  * goddamn this code is awful*/
 /*s[] is the recepticle*/
 int getop(char s[])
 {
 	int i = 0, c, d;/*ALWAYS INITIALIZE AS YOU DECLARE*/
-	static int ungotten = EOF; /*all that ungotten does is replace the first 
-	call to getch()*/
 	s[1] = '\0'; /*clear the string*/
 
-	if(ungotten != EOF && ungotten != ' ' && ungotten != '\t')
+	/*getop uses the exp_p and the expression string to operate*/
+	while((s[i] = c = expression[exp_p]) == ' ' || expression[exp_p] == '\t')
 	{
-		s[i] = c = ungotten;
-		ungotten = EOF;
-	}
-	else
-	{
-		while((s[i] = c = getch()) == ' ' || c == '\t')
-			;/*remove whitespace*/
+		exp_p++;
 	}
 
 	/*deal with function calls and variable names*/
 	if(isalpha(c))
 	{
-		while(isalpha(c = getch()))
+		while(isalpha(c = expression[exp_p++]))
 		{
-			/*handle it*/
 			s[++i] = c; /*avoid erroneous string contents*/
 		}
+
 		s[++i] = '\0';
-		ungotten = c;
+
 		if(strlen(s) == 1)
 		{
 			return VAR_NAME;
@@ -236,13 +236,14 @@ int getop(char s[])
 
 	if(!isdigit(c) && c != '.' && c != '-')
 	{
+		exp_p++;/*bad practise, really bad practise*/
 		return c; /*not a number, some form of instruction*/
 	}
 
 	/*handle negative number*/
 	if(c == '-')
 	{
-		d = getch();
+		d = expression[++exp_p];
 		if(!isdigit(d) && d != '.')
 		{
 			/*we've found a Subtraction command*/
@@ -255,59 +256,44 @@ int getop(char s[])
 
 	if(isdigit(c)) /*collect integer bit*/
 	{
-		while(isdigit(s[++i] = c = getch()))
-			;
+		while(isdigit(s[i] = c = expression[exp_p++]))
+		{
+			i++;
+		}
+			
 	}
 	if(c == '.') /*collect fraction bit*/
 	{	
-		while(isdigit(s[++i] = c = getch()))
-			;
+		while(isdigit(s[i] = c = expression[exp_p++]))
+		{
+			i++;
+		}
 	}
-	s[i] = '\0';
-	ungotten = c;
+	s[++i] = '\0';
 	printf("%s\n", s);
 	return NUMBER;
 }
 
-/*EXTERNAL CHAR BUFFER VARS ARE HERE*/
-char buf[BUFSIZE];
-int bufp = 0;
-
-/*buffer functions here*/
-/*I've misunderstood question 4.9, the char buffer cannot hold an EOF as it is
- * defined as -1, there must be some contingency measures in case ungetch(EOF)
- * gets called.*/
-/*these functions treat EOF the same as any other character*/
-int getch(void)
+/*no function arguments just copy straight to the expression var*/
+int getline()
 {
-	return (bufp > 0) ? buf[--bufp] : getchar();
-}
-
-void ungetch(int c)
-{
-	if (bufp >= BUFSIZE)
+	/*may need to restructure this to use an argument instead of an external
+	 * var*/
+	/*get the line mang*/
+	int c, i = 0;
+	for(i; i < LINE_LEN -1  && ((c = getchar()) != '\n' && c != EOF); i++)
 	{
-		printf("ungetch: too many characters\n");
+		expression[i] = c;
 	}
-	else if(c == EOF)
+	if(c == '\n')
 	{
-		printf("Error: cannot ungetch EOF");
+		expression[i] = '\n';
+		i++;
 	}
-	else
-	{
-		buf[bufp++] = c;
-	}
-}
-
-/*I don't see why ungets() would have to know about the buffer variables,
- * it just creates superflous data interactions if it does*/
-void ungets(char s[])
-{
-	int i = 0;
-	while(s[i++] != '\0')
-	{
-		ungetch(s[i]);
-	}
+	expression[i] = '\0';
+	/*this is convienient, we don't have to worry about EOF anymore*/
+	printf("got line -> %s", expression);
+	return i;
 }
 
 /*none of the functions I've just added do any error checking, i'm unsure of
