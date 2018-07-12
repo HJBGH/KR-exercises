@@ -26,68 +26,68 @@ required*/
 
 int main(int argc, char *argv[])
 {
-	char line[LINE_LENGTH];
-	int len;
-	have_args = argc;
-	if(have_args > MIN_ARGS)
-	{
-		printf("Calling parseargs\n");
-		if(parseargs(argc, argv) != 0)
-		{
-			printf("Error, bad arguments provided to detab\n");
-			return 1;/* I know I should use something like exit(0) but I'm
-			not familiar with those conventions*/
-		}
-	}
-	/*	
-	while((len = getline(line, LINE_LENGTH)) > 0)
-	{
-		detabline(line);
-	}*/
-	return 0;
+    char line[LINE_LENGTH];
+    int len;
+    have_args = argc;
+    if(have_args > MIN_ARGS)
+    {
+        printf("Calling parseargs\n");
+        if(parseargs(argc, argv) != 0)
+        {
+            printf("Error, bad arguments provided to detab\n");
+            return 1;/* I know I should use something like exit(0) but I'm
+            not familiar with those conventions*/
+        }
+    }
+    /*  
+    while((len = getline(line, LINE_LENGTH)) > 0)
+    {
+        detabline(line);
+    }*/
+    return 0;
 }
 
 /*returns -1 on error*/
 int parseargs(int argc, char *argv[])
 {
-	/*parse the arguments, convert and validate them*/
-	printf("called parseargs\n");
-	int i = 1;
-	errno = 0;
-	unsigned long tab;
-	char *endp;
-	while(i != MAX_TABSTOPS && argc != 0)
-	{
-		errno = 0; /*reset errno before we call strtoul*/
-		printf("About to call strtoul\n");
-		tab = strtoul(*(argv+i), &endp, BASE_TEN);	
-		printf("Survived strtoul!\n");
-		/*I can check for errors by inspecting the contents of *endp*/
-		if(errno != 0 || *endp != '\0' || (errno != 0 && tab == 0))
-		{
-			/*It's gone wrong*/
-			return -1;
-		}
-		tabstops[i] = tab;
-	}
-	return 0;
+    /*parse the arguments, convert and validate them*/
+    printf("called parseargs\n");
+    int i = 1;
+    errno = 0;
+    unsigned long tab;
+    char *endp;
+    while(i != MAX_TABSTOPS && argc != 0)
+    {
+        errno = 0; /*reset errno before we call strtoul*/
+        printf("About to call strtoul\n");
+        tab = strtoul(*(argv+i), &endp, BASE_TEN);  
+        printf("Survived strtoul!\n");
+        /*I can check for errors by inspecting the contents of *endp*/
+        if(errno != 0 || *endp != '\0' || (errno != 0 && tab == 0))
+        {
+            /*It's gone wrong*/
+            return -1;
+        }
+        tabstops[i] = tab;
+    }
+    return 0;
 }
-	
+    
 
 int getline(char line[], int ll)
 {
-	int c, i;
-	for(i = 0; i < ll-1 && (c = getchar()) != EOF && c != '\n'; i++)
-	{
-		line[i] = c;
-	}
-	if(c == '\n')
-	{
-		line[i] = c;
-		i++;
-	}
-	line[i] = '\0';
-	return i;
+    int c, i;
+    for(i = 0; i < ll-1 && (c = getchar()) != EOF && c != '\n'; i++)
+    {
+        line[i] = c;
+    }
+    if(c == '\n')
+    {
+        line[i] = c;
+        i++;
+    }
+    line[i] = '\0';
+    return i;
 }
 
 /*An unfortunate consequence of converting all tab chars to the equivalent
@@ -95,26 +95,26 @@ int getline(char line[], int ll)
  * memory space by an uncomfortable amount*/
 int detabline(char line[])
 {
-	/*used to construct the version of the line with the tabs replaced*/
-	int i, j, k;
-	for(i = 0, k = 0;	line[i] != EOF && line[i] != '\n'; i++)
-	{
-		switch(line[i])
-		{
-			case '\t':
-			/*handle tabs*/
-				for(j = TAB_COLUMNS - (k%TAB_COLUMNS); j>0; j--, k++)
-				{
-					putchar('#');
-				}
-				break;
-			case '\n':
-				putchar('\n');
-				break;
-			default:
-				putchar(line[i]);
-				k++;
-				break;
-		}
-	}
+    /*used to construct the version of the line with the tabs replaced*/
+    int i, j, k;
+    for(i = 0, k = 0;   line[i] != EOF && line[i] != '\n'; i++)
+    {
+        switch(line[i])
+        {
+            case '\t':
+            /*handle tabs*/
+                for(j = TAB_COLUMNS - (k%TAB_COLUMNS); j>0; j--, k++)
+                {
+                    putchar('#');
+                }
+                break;
+            case '\n':
+                putchar('\n');
+                break;
+            default:
+                putchar(line[i]);
+                k++;
+                break;
+        }
+    }
 }
