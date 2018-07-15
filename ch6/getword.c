@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     int n;
     char word[MAXWORD];
 
-    while(getowrd(word, MAXWORD) != EOF)
+    while(getword(word, MAXWORD) != EOF)
         if(isalpha(word[0]))
             if((n = binsearch(word, keytab, NKEYS)) >= 0)
                 keytab[n].count++;
@@ -93,6 +93,8 @@ int getword(char *word, int lim)
     return word[0];
 }
 
+#define BUFSIZE 100
+
 char buf[BUFSIZE];
 int bufp = 0;
 
@@ -111,4 +113,4 @@ void ungetch(int c)
         printf("ungetch error: too many characters\n");
     else
         buf[bufp++] = c;
-}
+} /*This is a test comment here are some keywords char int while while while*/
