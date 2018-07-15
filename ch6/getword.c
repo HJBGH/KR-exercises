@@ -29,17 +29,29 @@ struct key{
 
 int getword(char *, int);
 int binsearch(char *, struct key *, int);
-
+enum{CODE, COMMENT, PRE_PROC, STRING_LIT};
+unsigned int status = CODE;
 /*count C keywords*/
 int main(int argc, char *argv[])
 {
     int n;
+    char lastc;
     char word[MAXWORD];
 
     while(getword(word, MAXWORD) != EOF)
-        if(isalpha(word[0]))
+    {
+        if(isalpha(word[0]) && status == CODE)
+        {
             if((n = binsearch(word, keytab, NKEYS)) >= 0)
                 keytab[n].count++;
+        }
+        /*detect comments*/
+        else if(word[0] == '*' && lastc == '/' && strlen(word))
+        {
+            printf("COMMENT START DETECTED\n");
+        }
+        lastc = word[0];
+    }
     for(n = 0; n < NKEYS; n++)
         if(keytab[n].count > 0)
             printf("%4d %s\n", keytab[n].count, keytab[n].word);
