@@ -29,7 +29,7 @@ struct key{
 #define NKEYS (sizeof keytab / sizeof keytab[0])
 #define TEST /*I can put
 a comment here*/ unsigned int _24
-
+#define OTHER_TEST const char bleep
 int getword(char *, int);
 int binsearch(char *, struct key *, int);
 enum{CODE, COMMENT, PRE_PROC, STRING_LIT};
@@ -40,7 +40,9 @@ int main(int argc, char *argv[])
     int n;
     char lastc;
     char word[MAXWORD];
-   
+    
+    char * test = "const unsigned volatile volatile volatile volatile";
+    char * another_test = "'";
     while(getword(word, MAXWORD) != EOF)
     {
         if(isalpha(word[0]) && status == CODE)
@@ -67,6 +69,17 @@ int main(int argc, char *argv[])
         else if(word[0] == '\n' && status == PRE_PROC && strlen(word) == 1)
         {
             status = CODE;
+        }
+        else if(word[0] == '"' && strlen(word) == 1 && status == CODE)
+        {
+            if(lastc != '\''){
+                status = STRING_LIT;
+                /*printf("string lit\n");*/}
+        }
+        else if(word[0] == '"' && strlen(word) == 1 && status == STRING_LIT)
+        {
+            status = CODE;
+            /*printf("code\n");*/
         }
         lastc = word[0];
     }
