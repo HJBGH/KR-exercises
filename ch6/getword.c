@@ -26,8 +26,9 @@ struct key{
     "while", 0
 };
 
-#define NKEYS /*I can put comment 
-here*/ (sizeof keytab / sizeof keytab[0])
+#define NKEYS (sizeof keytab / sizeof keytab[0])
+#define TEST /*I can put
+a comment here*/ unsigned int _24
 
 int getword(char *, int);
 int binsearch(char *, struct key *, int);
@@ -55,6 +56,15 @@ int main(int argc, char *argv[])
         }
         else if(word[0] == '/' && lastc == '*' && 
                 strlen(word) == 1 && status == COMMENT)
+        {
+            status = CODE;
+        }
+        else if(word[0] == '#' && status == CODE && strlen(word) == 1)
+        {
+            /*printf("pre processor instruction detected\n");*/
+            status = PRE_PROC;
+        }
+        else if(word[0] == '\n' && status == PRE_PROC && strlen(word) == 1)
         {
             status = CODE;
         }
@@ -93,18 +103,23 @@ int getword(char *word, int lim)
     int c, getch(void);
     void ungetch(int);
     char *w = word;
-
+    
+    /*I have to modify this to return newlines*/
+    do{
+        c = getch();
+    }while(isspace(c) && c != '\n');
+    /*
     while(isspace(c = getch()))
-        ;
+        ;*/
     if(c != EOF)
         *w++ = c; 
-    if(!isalpha(c))
+    if(!isalpha(c) && c != '_')
     {
         *w = '\0';
         return c;
     }
     for(; --lim > 0; w++)
-        if(!isalnum(*w = getch()))
+        if(!isalnum(*w = getch()) && *w != '_')
         {
             ungetch(*w);
             break;
