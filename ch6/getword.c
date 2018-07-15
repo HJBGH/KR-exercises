@@ -1,5 +1,6 @@
 /*This file contains a copy of the getword program as given in chapter 
- * six of K&R 2nd edition*/
+ * six of K&R 2nd edition, note that the keywords will only be counted
+ * accurately for valid c programs that can compile with "gcc -ansi"*/
 
 #include <ctype.h>
 #include <stdio.h>
@@ -25,7 +26,8 @@ struct key{
     "while", 0
 };
 
-#define NKEYS (sizeof keytab / sizeof keytab[0])
+#define NKEYS /*I can put comment 
+here*/ (sizeof keytab / sizeof keytab[0])
 
 int getword(char *, int);
 int binsearch(char *, struct key *, int);
@@ -37,7 +39,7 @@ int main(int argc, char *argv[])
     int n;
     char lastc;
     char word[MAXWORD];
-
+   
     while(getword(word, MAXWORD) != EOF)
     {
         if(isalpha(word[0]) && status == CODE)
@@ -46,9 +48,15 @@ int main(int argc, char *argv[])
                 keytab[n].count++;
         }
         /*detect comments*/
-        else if(word[0] == '*' && lastc == '/' && strlen(word))
+        else if(word[0] == '*' && lastc == '/' && 
+                strlen(word) == 1 && status == CODE)
         {
-            printf("COMMENT START DETECTED\n");
+            status = COMMENT;
+        }
+        else if(word[0] == '/' && lastc == '*' && 
+                strlen(word) == 1 && status == COMMENT)
+        {
+            status = CODE;
         }
         lastc = word[0];
     }
