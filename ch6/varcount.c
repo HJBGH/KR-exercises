@@ -7,28 +7,25 @@
 
 #define MAXWORD 100
 
-struct key{
-    char *word;
-    int count;
-} keytab[] = {
-    "auto", 0,
-    "break", 0,
-    "case", 0,
-    "char", 0,
-    "const", 0,
-    "continue", 0,
-    "default", 0,
-    /*... more may go here*/
-    "unsigned", 0,
-    "void", 0,
-    "volatile", 0,
-    "while", 0
+char * keywords[] = {
+    "auto",
+    "break",
+    "case",
+    "char",
+    "const",
+    "continue",
+    "default",
+    "unsigned", 
+    "void",
+    "volatile",
+    "while",
+    "sizeof"
 };
 
 
 /*binary tree nodes for collecting variable names*/
 struct tnode{
-     *word;
+    char *word;
     int count;
     struct tnode *left;
     struct tnode *right;
@@ -37,14 +34,14 @@ struct tnode{
 #define NKEYS (sizeof keytab / sizeof keytab[0])
 
 int getword(char *, int);
-int binsearch(char *, struct key *, int);
+struct tnode * bintreesearch(struct tnode *p, char *w); /*search a binary tree*/
 void treeprint(struct tnode *p); /*in order print function*/
-struct tnode *addtree(struct tnode *p, char *w);
+struct tnode * addtree(struct tnode *p, char *w);
 /*remember to define support functions for this*/
 enum{CODE, COMMENT, PRE_PROC, STRING_LIT};
 
 unsigned int status = CODE;
-/*count C keywords*/
+/*collect variable names in a C source file*/
 int main(int argc, char *argv[])
 {
     int n;
@@ -55,7 +52,7 @@ int main(int argc, char *argv[])
     {
         if(isalpha(word[0]) && status == CODE)
         {
-            if((n = binsearch(word, keytab, NKEYS)) >= 0)
+            /*if((n = binsearch(word, keytab, NKEYS)) >= 0)*/
                 keytab[n].count++;
         }
         /*detect comments*/
@@ -91,33 +88,33 @@ int main(int argc, char *argv[])
         }
         lastc = word[0];
     }
+    /* the loop below will be replaced with a call to treeprint(struct tnode *p)
     for(n = 0; n < NKEYS; n++)
         if(keytab[n].count > 0)
-            printf("%4d %s\n", keytab[n].count, keytab[n].word);
+            printf("%4d %s\n", keytab[n].count, keytab[n].word);*/
     return 0;
 }
 
-struct * tnode bintreesearch(struct *tnode p); /*search a binary tree*/
 
 /*binary search for the keytab array, needs to be updated to search a bin tree*/
-int binsearch(char *word, struct key tab[], int n)
+struct tnode * bintreesearch(struct tnode * p, char *w)
 {
-    int cond;
-    int low, high, mid;
+    if(p == NULL)/*the word doesn't occur in the tree*/
+        return p;
 
-    low = 0;
-    high = n - 1;
-    while(low <= high)
+    int c = strcmp(w, p->word); 
+    if(c < 0)
     {
-        mid = (low+high)/2;
-        if((cond = strcmp(word, tab[mid].word)) < 0)
-            high = mid -1;
-        else if (cond > 0)
-            low = mid + 1;
-        else
-            return mid;/*return the position of the element*/
+        return bintreesearch(p->left, w);
     }
-    return -1;/*element not in array*/
+    else if (c > 0)
+    {
+        return bintreesearch(p->right, w);
+    }
+    else if (c == 0)
+    {
+        return p;
+    }
 }
 
 /*getword and the getch-ungetch pair are essential to pretty much
