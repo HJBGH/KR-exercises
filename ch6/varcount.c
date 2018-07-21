@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define MAXWORD 100
 
@@ -25,7 +26,7 @@ char * keywords[] = {
 
 /*binary tree nodes for collecting variable names*/
 struct tnode{
-    char word[MAXWORD];
+    char *word;
     int count;
     struct tnode *left;
     struct tnode *right;
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
     char last_word[MAXWORD] = "";
     char word[MAXWORD];
     char lastc = '\0';
-    
+    struct tnode *tree = NULL;   
     while(getword(word, MAXWORD) != EOF)
     {
         if((word[0] == '=' || word[0] == '[') && strlen(word) == 1 && status == CODE)
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
             if(validateName(last_word))
             {
                 printf("variable! : %s\n", last_word);
+                tree = addtree(tree, last_word);
             }
         }
         /*detect comments*/
@@ -136,7 +138,7 @@ int validateName(const char *name)
     return *name;
 }
 
-/*binary search for the keytab array, needs to be updated to search a bin tree*/
+/*binary search for a binary tree*/
 struct tnode * bintreesearch(struct tnode * p, char *w)
 {
     if(p == NULL)/*the word doesn't occur in the tree*/
@@ -156,6 +158,49 @@ struct tnode * bintreesearch(struct tnode * p, char *w)
         return p;
     }
 }
+
+/*helper functions for addtree*/
+struct tnode *talloc(void);
+//char *strdup(char *);
+
+/*adding something to a binary tree*/
+struct tnode * addtree(struct tnode *p, char *w)
+{
+    int cond;    
+    /* I need to malloc new space*/
+    /*printf("addtree called\n");*/
+    if(p == NULL)
+    {
+        /*printf("creating new node\n");*/
+        p = talloc();
+        p->word = strdup(w);
+        p->left = p->right = NULL;
+    } else if ((cond = strcmp(w, p->word)) < 0)
+        p->left = addtree(p->left, w);
+    else if(cond > 0)
+        p->right = addtree(p->right, w);
+
+    /*printf("returning p\n");*/
+    return p; 
+}
+
+/*talloc: allocate memory fro a tnode, ripped from page 142*/
+struct tnode *talloc(void)
+{
+    /*printf("talloc called\n");*/
+    return (struct tnode *) malloc(sizeof(struct tnode));
+}
+
+/*strdup, duplicate a string*/
+/*
+char *strdup(char *s)
+{
+    char *p;
+    p = (char *) malloc(strlen(s) + 1); 
+    if(p != NULL)
+        strcpy(p, s);
+    return p;
+}*/
 
 /*getword and the getch-ungetch pair are essential to pretty much
  * any project in this chapter*/
