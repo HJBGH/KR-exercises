@@ -34,6 +34,7 @@ struct tnode{
 #define NKEYS (sizeof keytab / sizeof keytab[0])
 
 int getword(char *, int);
+int validateName(const char *); /*check to see if a string is valid variable name*/
 struct tnode * bintreesearch(struct tnode *p, char *w); /*search a binary tree*/
 void treeprint(struct tnode *p); /*in order print function*/
 struct tnode * addtree(struct tnode *p, char *w);
@@ -61,8 +62,11 @@ int main(int argc, char *argv[])
         if(word[0] == '=' && strlen(word) == 1 && status == CODE)
         {
             /*if((n = binsearch(word, keytab, NKEYS)) >= 0)*/
-            if(isalpha(last_word[0]))
+            /*validate a variable name*/
+            if(validateName(last_word))
+            {
                 printf("variable! : %s\n", last_word);
+            }
         }
         /*detect comments*/
         else if(word[0] == '*' && lastc == '/' && 
@@ -105,6 +109,32 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+/*check to see if a string is a valid string*/
+int validateName(const char *name)
+{
+    const char *p = name;
+
+    if(!isalpha(*p) && *p != '_')/*check if the first character is correct*/
+    {
+        /*printf("wrong start: %c\n", *p);*/
+        return 0;
+    }
+
+    p++; 
+
+    /*check the rest of the string*/
+    while(*p != '\0')
+    {
+        if(!isalnum(*p) && *p != '_')
+        {
+            return 0;
+        }
+        p++;
+    }
+    
+    /*valid variable name found*/
+    return *name;
+}
 
 /*binary search for the keytab array, needs to be updated to search a bin tree*/
 struct tnode * bintreesearch(struct tnode * p, char *w)
@@ -157,6 +187,7 @@ int getword(char *word, int lim)
             break;
         }
     *w = '\0';
+    /*printf("word: %s\n" , word);*/
     return word[0];
 }
 
