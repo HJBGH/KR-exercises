@@ -25,11 +25,11 @@ char * keywords[] = {
 
 /*binary tree nodes for collecting variable names*/
 struct tnode{
-    char *word;
+    char word[MAXWORD];
     int count;
     struct tnode *left;
     struct tnode *right;
-}
+};
 
 #define NKEYS (sizeof keytab / sizeof keytab[0])
 
@@ -44,16 +44,25 @@ unsigned int status = CODE;
 /*collect variable names in a C source file*/
 int main(int argc, char *argv[])
 {
+    /*these are some test variables to see if I've got the variable
+     * identification nailed down*/
+    char test = 'a';
+    int _test = 10000;
+    const float t35t = 3.5f;
+    unsigned char _t35t = '\n';
+
     int n;
-    char lastc;
+    char last_word[MAXWORD] = "";
     char word[MAXWORD];
+    char lastc = '\0';
     
     while(getword(word, MAXWORD) != EOF)
     {
-        if(isalpha(word[0]) && status == CODE)
+        if(word[0] == '=' && strlen(word) == 1 && status == CODE)
         {
             /*if((n = binsearch(word, keytab, NKEYS)) >= 0)*/
-                keytab[n].count++;
+            if(isalpha(last_word[0]))
+                printf("variable! : %s\n", last_word);
         }
         /*detect comments*/
         else if(word[0] == '*' && lastc == '/' && 
@@ -86,6 +95,7 @@ int main(int argc, char *argv[])
             status = CODE;
             /*printf("code\n");*/
         }
+        strcpy(last_word, word);
         lastc = word[0];
     }
     /* the loop below will be replaced with a call to treeprint(struct tnode *p)
