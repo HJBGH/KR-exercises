@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     
     while(getword(word, MAXWORD) != EOF)
     {
-        if(word[0] == '=' && strlen(word) == 1 && status == CODE)
+        if((word[0] == '=' || word[0] == '[') && strlen(word) == 1 && status == CODE)
         {
             /*if((n = binsearch(word, keytab, NKEYS)) >= 0)*/
             /*validate a variable name*/
