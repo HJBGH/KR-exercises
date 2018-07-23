@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "hb_strncmp.h"
 
 #define MAXWORD 100
 
@@ -41,7 +42,7 @@ struct tnode
 };
 
 #define NKEYS (sizeof keytab / sizeof keytab[0])
-
+int comp_len;
 int getword(char *, int);
 int validateName(const char *); /*check to see if a string is valid variable name*/
 struct tnode * bintreesearch(struct tnode *p, char *w); /*search a binary tree*/
@@ -60,7 +61,8 @@ int isuintstr(char * string)
     printf("string: %s\n", string);
     while(*(string+c) != '\0' && isdigit(*(string+c))) c++;
 
-    if(*(string+c) !=  '\0') return 0;/*i.e. a non numeric character has been found
+    if(*(string+c) !=  '\0') return 0;
+    /*i.e. a non numeric character has been found
     */
     return 1;
 }
@@ -80,7 +82,9 @@ int main(int argc, char *argv[])
     char word[MAXWORD];
     char lastc = '\0';
     struct tnode *tree = NULL;
-
+    
+    char * test_string = hb_strndup("This is a test string, do not be afraid", 15);
+    printf("result: %s\n", test_string);
     /*check arguments*/
     if(argc != 2)
     {   
@@ -93,6 +97,7 @@ int main(int argc, char *argv[])
         printf("AAAAAAA");
         return EXIT_FAILURE;
     }
+    comp_len = atoi(argv[1]); /*the length of string to compare*/
 
     printf("trying to run core of program\n");
     while(getword(word, MAXWORD) != EOF)
@@ -175,26 +180,6 @@ int validateName(const char *name)
     return *name;
 }
 
-/*binary search for a binary tree*/
-struct tnode * bintreesearch(struct tnode * p, char *w)
-{
-    if(p == NULL)/*the word doesn't occur in the tree*/
-        return p;
-
-    int c = strcmp(w, p->word); 
-    if(c < 0)
-    {
-        return bintreesearch(p->left, w);
-    }
-    else if (c > 0)
-    {
-        return bintreesearch(p->right, w);
-    }
-    else if (c == 0)
-    {
-        return p;
-    }
-}
 
 /*helper functions for addtree*/
 struct tnode *talloc(void);
