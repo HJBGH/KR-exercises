@@ -1,5 +1,5 @@
 /*This file contains a solution to project 6.2 of chapter six of K&R 2nd 
- * edition*/
+ * edition, the efficiency of this solution is utter garbage*/
 
 #include <ctype.h>
 #include <stdio.h>
@@ -24,10 +24,18 @@ char * keywords[] = {
 };
 
 
-/*binary tree nodes for collecting variable names*/
-struct tnode{
+/*linked list nodes for keeping arranging variable groups*/
+struct llnode
+{
     char *word;
-    int count; /*<- this shouldn't be here, it's useless for this program*/
+    struct llnode *next;
+};
+
+/*binary tree nodes for collecting variable names*/
+struct tnode
+{
+    char *title;
+    struct llnode *word; /*<- this shouldn't be here, it's useless for this program*/
     struct tnode *left;
     struct tnode *right;
 };
@@ -43,6 +51,20 @@ struct tnode * addtree(struct tnode *p, char *w);
 enum{CODE, COMMENT, PRE_PROC, STRING_LIT};
 
 unsigned int status = CODE;
+
+/*takes a null terminated string*/
+int isuintstr(char * string)
+{
+    printf("trying to run isunitstr()\n");
+    int c = 0;
+    printf("string: %s\n", string);
+    while(*(string+c) != '\0' && isdigit(*(string+c))) c++;
+
+    if(*(string+c) !=  '\0') return 0;/*i.e. a non numeric character has been found
+    */
+    return 1;
+}
+
 /*collect variable names in a C source file*/
 int main(int argc, char *argv[])
 {
@@ -57,7 +79,22 @@ int main(int argc, char *argv[])
     char last_word[MAXWORD] = "";
     char word[MAXWORD];
     char lastc = '\0';
-    struct tnode *tree = NULL;   
+    struct tnode *tree = NULL;
+
+    /*check arguments*/
+    if(argc != 2)
+    {   
+        printf("takes a single argument twat mackerel\n");
+        return EXIT_FAILURE;
+    }
+    printf("arg: %s\n", argv[1]);
+    if(!isuintstr(argv[1]))
+    {
+        printf("AAAAAAA");
+        return EXIT_FAILURE;
+    }
+
+    printf("trying to run core of program\n");
     while(getword(word, MAXWORD) != EOF)
     {
         if((word[0] == '=' || word[0] == '[') && strlen(word) == 1 && status == CODE)
@@ -161,6 +198,7 @@ struct tnode * bintreesearch(struct tnode * p, char *w)
 
 /*helper functions for addtree*/
 struct tnode *talloc(void);
+struct llnode *llalloc(void);
 //char *strdup(char *);
 
 /*adding something to a binary tree*/
@@ -168,17 +206,19 @@ struct tnode * addtree(struct tnode *p, char *w)
 {
     int cond;    
     /* I need to malloc new space*/
-    /*printf("addtree called\n");*/
     if(p == NULL)
     {
         /*printf("creating new node\n");*/
         p = talloc();
-        p->word = strdup(w);
+        p->title = "fug:D"; /*this needs to be fixed*/
+        p->word = llalloc();
+        p->word->word = strdup(w);
         p->left = p->right = NULL;
     } else if ((cond = strcmp(w, p->word)) < 0)
         p->left = addtree(p->left, w);
     else if(cond > 0)
         p->right = addtree(p->right, w);
+    /*I also need to add a condition wherein the specified number of chars match*/
 
     /*printf("returning p\n");*/
     return p; 
@@ -202,6 +242,10 @@ struct tnode *talloc(void)
     return (struct tnode *) malloc(sizeof(struct tnode));
 }
 
+struct llnode *llalloc(void)
+{
+    return (struct llnode *) malloc(sizeof(struct llnode));
+}
 /*strdup, duplicate a string*/
 /*
 char *strdup(char *s)
