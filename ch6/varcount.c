@@ -27,7 +27,7 @@ char * keywords[] = {
 /*binary tree nodes for collecting variable names*/
 struct tnode{
     char *word;
-    int count;
+    int count; /*<- this shouldn't be here, it's useless for this program*/
     struct tnode *left;
     struct tnode *right;
 };
@@ -66,7 +66,6 @@ int main(int argc, char *argv[])
             /*validate a variable name*/
             if(validateName(last_word))
             {
-                printf("variable! : %s\n", last_word);
                 tree = addtree(tree, last_word);
             }
         }
@@ -108,6 +107,7 @@ int main(int argc, char *argv[])
     for(n = 0; n < NKEYS; n++)
         if(keytab[n].count > 0)
             printf("%4d %s\n", keytab[n].count, keytab[n].word);*/
+    treeprint(tree);
     return 0;
 }
 
@@ -182,6 +182,17 @@ struct tnode * addtree(struct tnode *p, char *w)
 
     /*printf("returning p\n");*/
     return p; 
+}
+
+/*treeprint: in-order print of tree p, ripped from page 142*/
+void treeprint(struct tnode *p)
+{
+    if(p != NULL)
+    {
+        treeprint(p->left);
+        printf("%s\n",  p->word);
+        treeprint(p->right);
+    }
 }
 
 /*talloc: allocate memory fro a tnode, ripped from page 142*/
