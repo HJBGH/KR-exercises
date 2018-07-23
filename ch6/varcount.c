@@ -82,9 +82,9 @@ int main(int argc, char *argv[])
     char word[MAXWORD];
     char lastc = '\0';
     struct tnode *tree = NULL;
-    
+    /* 
     char * test_string = hb_strndup("This is a test string, do not be afraid", 15);
-    printf("result: %s\n", test_string);
+    printf("result: %s\n", test_string);*/
     /*check arguments*/
     if(argc != 2)
     {   
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     comp_len = atoi(argv[1]); /*the length of string to compare*/
-
+    printf("comparison length: %d\n", comp_len);
     printf("trying to run core of program\n");
     while(getword(word, MAXWORD) != EOF)
     {
@@ -195,11 +195,29 @@ struct tnode * addtree(struct tnode *p, char *w)
     {
         /*printf("creating new node\n");*/
         p = talloc();
-        p->title = "fug:D"; /*this needs to be fixed*/
+        p->title = hb_strndup(w, comp_len); /*this needs to be fixed*/
         p->word = llalloc();
         p->word->word = strdup(w);
+        p->word->next = NULL;
         p->left = p->right = NULL;
-    } else if ((cond = strcmp(w, p->word)) < 0)
+    } 
+    else if ((cond = hb_strncmp(w, p->word->word, comp_len)) == 0)
+    {
+        /*uh oh, I've found a pre-existing category, time to insert on the 
+         * linked list, do this iteratively otherwise the stack gets too deep*/
+        struct llnode * ptr;
+        for(ptr = p->word; ptr->next != NULL; ptr = ptr->next)
+        {
+            if(strcmp(ptr->word, w) == 0) break;
+        }
+        if(ptr->next == NULL && strcmp(ptr->word, w) != 0)
+        {
+            ptr->next = llalloc();
+            ptr->next->next = NULL;
+            ptr->next->word = strdup(w);
+        }
+    }
+    else if(cond < 0)
         p->left = addtree(p->left, w);
     else if(cond > 0)
         p->right = addtree(p->right, w);
@@ -209,14 +227,26 @@ struct tnode * addtree(struct tnode *p, char *w)
     return p; 
 }
 
+void llprint(struct llnode *n);
 /*treeprint: in-order print of tree p, ripped from page 142*/
 void treeprint(struct tnode *p)
 {
     if(p != NULL)
     {
         treeprint(p->left);
-        printf("%s\n",  p->word);
+        printf("category: %s\n",  p->title);
+        llprint(p->word);
+        printf("-------------\n");
         treeprint(p->right);
+    }
+}
+
+void llprint(struct llnode *n)
+{
+    while(n != NULL)
+    {
+        printf("%s\n", n->word);
+        n = n->next;
     }
 }
 
