@@ -25,7 +25,7 @@ char * keywords[] = {
 };
 
 
-/*linked list nodes for keeping arranging variable groups*/
+/*linked list nodes for arranging variable groups*/
 struct llnode
 {
     char *word;
@@ -36,7 +36,7 @@ struct llnode
 struct tnode
 {
     char *title;
-    struct llnode *word; /*<- this shouldn't be here, it's useless for this program*/
+    struct llnode *word; 
     struct tnode *left;
     struct tnode *right;
 };
@@ -45,7 +45,6 @@ struct tnode
 int comp_len;
 int getword(char *, int);
 int validateName(const char *); /*check to see if a string is valid variable name*/
-struct tnode * bintreesearch(struct tnode *p, char *w); /*search a binary tree*/
 void treeprint(struct tnode *p); /*in order print function*/
 struct tnode * addtree(struct tnode *p, char *w);
 /*remember to define support functions for this*/
