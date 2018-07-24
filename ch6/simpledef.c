@@ -24,6 +24,8 @@ unsigned hash(char *s);
 struct nlist * lookup(char *s);
 struct nlist * install(char *name, char *defn);
 int getword(char *, int);
+int getdefn(char *, int); /*a variant of getword, returns every part of a line
+up until the '\n'*/
 enum{CODE, COMMENT, PRE_PROC, STRING_LIT};
 unsigned int status = CODE;
 
@@ -33,16 +35,23 @@ refer to this as a table*/
 /*super basic #define pre-processor*/
 int main(int argc, char *argv[])
 {
-    int n;
+    int n; /* I don't remember what n was used for*/
     char lastc;
     char word[MAXWORD];
     /*printf("%d\n", BUFSIZE); trying to use a macro before it's defined
      * doesn't work*/
     while(getword(word, MAXWORD) != EOF)
     {
-        if(isalpha(word[0]) && status == CODE)
+        /*This doesn't write out to file, it just prints the 
+         * processed text straight to terminal*/
+
+        if(strcmp("define", word) == 0 && status == PRE_PROC)
         {
-            /*#define processing goes here*/ 
+            char name[MAXWORD], defn[MAXWORD];
+            getword(name, MAXWORD);
+            getdefn(defn, MAXWORD);
+            printf("installing new definition: %s, %s\n", name, defn);
+            install(name, defn);
         }
         /*detect comments*/
         else if(word[0] == '*' && lastc == '/' && 
@@ -74,6 +83,14 @@ int main(int argc, char *argv[])
         {
             status = CODE;
             /*printf("code\n");*/
+        }
+        else if(status == CODE)
+        {
+            struct nlist * replacement = lookup(word);
+            if(replacement != NULL)
+                printf("%s", replacement->defn);
+            /*else
+                printf("%s", word);*/
         }
         lastc = word[0];
     }
@@ -170,6 +187,33 @@ int getword(char *word, int lim)
         }
     *w = '\0';
     return word[0];
+}
+
+/*used to get the replacement string after a #define declaration is detected*/
+int getdefn(char *word, int lim)
+{
+    int c, getch(void);
+    void ungetch(int);
+    char *w = word;
+    
+    do
+    {
+        c = getch();
+    }
+    while(isspace(c)); /*eat whitespace*/
+
+    if(c != EOF)
+        *w++ = c; 
+    /*get the remaining string*/
+    for(; --lim > 0; w++)
+        if((*w = getch()) == '\n')
+        {
+            ungetch(*w);
+            break;
+        }
+    *w = '\0';
+    return word[0];
+
 }
 
 #define BUFSIZE 100
