@@ -1,8 +1,8 @@
-/*This file will contain a solution to project 6.3 of chapter six of K&R 2nd 
+/*This file will contain a solution to project 6.4 of K&R 2nd 
  * edition, the efficiency of this solution is utter garbage*/
 /*The idea of this program is according to the requirements laid out on page
- * 143: This is a cross referencer that prints a list of all words in
- * a document, and, for each word a list of the line numbers it occurs on. 
+ * 143: This program reprints the words in it's input ordered by the frequency
+ * by which they occur.
  * Note that this solution differs from the prescribed conditions in that it 
  * does not ignore "noise"; prepositions, conjunctives, etc*/
 /*for the sake of the exercise we consider a word to be any string of 
@@ -17,19 +17,11 @@
 
 #define MAXWORD 100
 
-/*linked list nodes for keeping arranging variable groups*/
-/*I'll have to update my method of insertion*/
-struct llnode
-{
-    int line;
-    struct llnode *next;
-};
-
 /*binary tree nodes for collecting variable names*/
 struct tnode
 {
     char *word;
-    struct llnode *lines;
+    unsigned int count;
     struct tnode *left;
     struct tnode *right;
 };
@@ -37,7 +29,13 @@ struct tnode
 
 int getalphaword(char *, int);
 void treeprint(struct tnode *p); /*in order print function*/
-struct tnode * addtree(struct tnode *p, char *w, int linenum);
+/*lexical add tree constructs a bt based on the lexical ordering of the
+ * data*/
+struct tnode * lexicaladdtree(struct tnode *p, char *w);
+struct tnode * newtree(struct tnode *t, struct tnode *old);
+
+/*rebuilds an existing binary tree according to the "count" attribute of the
+ * tnode struct*/
 
 /*collect variable names in a C source file*/
 int main(int argc, char *argv[])
@@ -45,9 +43,6 @@ int main(int argc, char *argv[])
     int line;
     char word[MAXWORD];
     struct tnode *tree = NULL;
-    /* 
-    char * test_string = hb_strndup("This is a test string, do not be afraid", 15);
-    printf("result: %s\n", test_string);*/
     /*check arguments*/
     printf("trying to run core of program\n");
     while(getalphaword(word, MAXWORD) != EOF)
@@ -58,20 +53,20 @@ int main(int argc, char *argv[])
             /*getalphaword is designed to ensure that a whole string is
              * alphabetical or only of length 1*/
             /*printf("%s\n", word);*/
-            tree = addtree(tree, word, line);
+            tree = lexicaladdtree(tree, word);
         }
-    }   
-    treeprint(tree);
+    }
+    struct tnode *new = NULL; 
+    new = newtree(new, tree);
+    treeprint(new);
     return 0;
 }
 
 /*helper functions for addtree*/
 struct tnode *talloc(void);
-struct llnode *llalloc(void);
-//char *strdup(char *);
 
 /*adding something to a binary tree*/
-struct tnode * addtree(struct tnode *p, char *w, int linenum)
+struct tnode * lexicaladdtree(struct tnode *p, char *w)
 {
     int cond;    
     /* I need to malloc new space*/
@@ -80,66 +75,72 @@ struct tnode * addtree(struct tnode *p, char *w, int linenum)
         /*printf("creating new node\n");*/
         p = talloc();
         p->word = strdup(w); /*this needs to be fixed*/
-        p->lines = llalloc();
-        p->lines->line = linenum;
-        p->lines->next = NULL;
+        p->count = 1;
         p->left = p->right = NULL;
     } 
     else if ((cond = strcmp(w, p->word)) == 0)
-    {
-        /*uh oh, I've found a pre-existing list, time to insert on the 
-         * linked list, do this iteratively otherwise the stack gets too deep*/
-        struct llnode * new = llalloc();
-        new->next = p->lines;
-        p->lines = new;
-        new->line = linenum;
-    }
+        p->count++;
     else if(cond < 0)
-        p->left = addtree(p->left, w, linenum);
+        p->left = lexicaladdtree(p->left, w);
     else if(cond > 0)
-        p->right = addtree(p->right, w, linenum);
-    /*I also need to add a condition wherein the specified number of chars match*/
-
-    /*printf("returning p\n");*/
+        p->right = lexicaladdtree(p->right, w);
     return p; 
 }
 
-void llprint(struct llnode *n);
+/*n will consist of nodes copied from the original tree*/
+struct tnode * qntaddtree(struct tnode *t, struct tnode *n)
+{
+    if(t == NULL)
+    {
+        t = n;
+    }
+    else if(t->count == n->count)
+    {
+        n->left = t->left;
+        t->left = n;
+    }
+    else if(t->count > n->count)
+        t->left = qntaddtree(t->left, n);
+    else if(t->count < n->count)
+        t->right = qntaddtree(t->right, n);
+
+    return t;
+}
+
+struct tnode * newtree(struct tnode *new, struct tnode *old)
+{
+    if(old != NULL)
+    {
+        new = newtree(new, old->left);
+        new = newtree(new, old->right);
+
+        /*copy the node across*/
+        struct tnode * nn = talloc();
+        nn->count = old->count;
+        nn->word = strdup(old->word);
+        nn->left = nn->right = NULL;
+        new = qntaddtree(new, nn);
+    }
+    return new;
+}
 /*treeprint: in-order print of tree p, ripped from page 142*/
 void treeprint(struct tnode *p)
 {
     if(p != NULL)
     {
         treeprint(p->left);
-        printf("word: %s\n",  p->word);
-        llprint(p->lines);
-        printf("-------------\n");
+        printf("%d,  %s\n",  p->count, p->word);
         treeprint(p->right);
     }
-}
-
-void llprint(struct llnode *n)
-{
-    while(n != NULL)
-    {
-        printf("%d,", n->line);
-        n = n->next;
-    }
-    printf("\n");
 }
 
 /*talloc: allocate memory fro a tnode, ripped from page 142*/
 struct tnode *talloc(void)
 {
-    /*printf("talloc called\n");*/
     return (struct tnode *) malloc(sizeof(struct tnode));
 }
 
-struct llnode *llalloc(void)
-{
-    return (struct llnode *) malloc(sizeof(struct llnode));
-}
-
+/*how to quicksort a binary tree?*/
 /*getword and the getch-ungetch pair are essential to pretty much
  * any project in this chapter*/
 /*getword; get the next word or character from input*/
